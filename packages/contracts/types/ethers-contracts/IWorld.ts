@@ -43,6 +43,7 @@ export interface IWorldInterface extends utils.Interface {
     "installModule(address,bytes)": FunctionFragment;
     "installRootModule(address,bytes)": FunctionFragment;
     "isStore()": FunctionFragment;
+    "move(int32,int32,int32)": FunctionFragment;
     "pushToField(uint256,bytes32[],uint8,bytes)": FunctionFragment;
     "pushToField(bytes16,bytes16,bytes32[],uint8,bytes)": FunctionFragment;
     "registerSchema(uint256,bytes32,bytes32)": FunctionFragment;
@@ -71,6 +72,7 @@ export interface IWorldInterface extends utils.Interface {
       | "installModule"
       | "installRootModule"
       | "isStore"
+      | "move"
       | "pushToField(uint256,bytes32[],uint8,bytes)"
       | "pushToField(bytes16,bytes16,bytes32[],uint8,bytes)"
       | "registerSchema"
@@ -153,6 +155,14 @@ export interface IWorldInterface extends utils.Interface {
     values: [PromiseOrValue<string>, PromiseOrValue<BytesLike>]
   ): string;
   encodeFunctionData(functionFragment: "isStore", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "move",
+    values: [
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>
+    ]
+  ): string;
   encodeFunctionData(
     functionFragment: "pushToField(uint256,bytes32[],uint8,bytes)",
     values: [
@@ -278,6 +288,7 @@ export interface IWorldInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "isStore", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "move", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "pushToField(uint256,bytes32[],uint8,bytes)",
     data: BytesLike
@@ -475,6 +486,13 @@ export interface IWorld extends BaseContract {
 
     isStore(overrides?: CallOverrides): Promise<[void]>;
 
+    move(
+      x: PromiseOrValue<BigNumberish>,
+      y: PromiseOrValue<BigNumberish>,
+      z: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     "pushToField(uint256,bytes32[],uint8,bytes)"(
       table: PromiseOrValue<BigNumberish>,
       key: PromiseOrValue<BytesLike>[],
@@ -633,6 +651,13 @@ export interface IWorld extends BaseContract {
 
   isStore(overrides?: CallOverrides): Promise<void>;
 
+  move(
+    x: PromiseOrValue<BigNumberish>,
+    y: PromiseOrValue<BigNumberish>,
+    z: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   "pushToField(uint256,bytes32[],uint8,bytes)"(
     table: PromiseOrValue<BigNumberish>,
     key: PromiseOrValue<BytesLike>[],
@@ -788,6 +813,13 @@ export interface IWorld extends BaseContract {
     ): Promise<void>;
 
     isStore(overrides?: CallOverrides): Promise<void>;
+
+    move(
+      x: PromiseOrValue<BigNumberish>,
+      y: PromiseOrValue<BigNumberish>,
+      z: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     "pushToField(uint256,bytes32[],uint8,bytes)"(
       table: PromiseOrValue<BigNumberish>,
@@ -980,6 +1012,13 @@ export interface IWorld extends BaseContract {
 
     isStore(overrides?: CallOverrides): Promise<BigNumber>;
 
+    move(
+      x: PromiseOrValue<BigNumberish>,
+      y: PromiseOrValue<BigNumberish>,
+      z: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     "pushToField(uint256,bytes32[],uint8,bytes)"(
       table: PromiseOrValue<BigNumberish>,
       key: PromiseOrValue<BytesLike>[],
@@ -1138,6 +1177,13 @@ export interface IWorld extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     isStore(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    move(
+      x: PromiseOrValue<BigNumberish>,
+      y: PromiseOrValue<BigNumberish>,
+      z: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
 
     "pushToField(uint256,bytes32[],uint8,bytes)"(
       table: PromiseOrValue<BigNumberish>,
