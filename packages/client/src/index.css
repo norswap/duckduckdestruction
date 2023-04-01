@@ -14,12 +14,27 @@ img {
 
 .pfp {
     position: fixed;
-    bottom: 2rem;
-    left: 2rem;
+    bottom: 1rem;
+    left: 1rem;
+    pointer-events: none;
+    background: gray;
+    z-index: 99;
+    padding: 0.5rem 0.5rem 0.25rem 0.5rem;
+}
+
+.pfp img {
     width: 200px;
     height: 200px;
-    border: 2px solid gray;
-    pointer-events: none;
+}
+
+.pfp h1 {
+    font-size: 1rem;
+    color: #fff;
+    text-shadow: 2px 2px 2px red;
+}
+
+.loading {
+    font-size: 5rem;
 }
 
 .intro {

@@ -188,19 +188,6 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "bytes32",
-        name: "ID",
-        type: "bytes32",
-      },
-    ],
-    name: "discharge",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
         internalType: "uint256",
         name: "table",
         type: "uint256",

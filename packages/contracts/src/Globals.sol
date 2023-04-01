@@ -12,5 +12,7 @@ uint8 constant DISCHARGE_SPEED = 1;
 uint8 constant MAP_HEIGHT = 50;
 uint8 constant MAP_WIDTH = 50;
 
+uint16 constant MOVE_DISTANCE = 1;
+
 uint16 constant DASH_DISTANCE = 3;
 uint8 constant DASH_COOLDOWN = 7;

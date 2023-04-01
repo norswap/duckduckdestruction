@@ -5,6 +5,21 @@ import { defineComponent, Type as RecsType, World } from "@latticexyz/recs";
 
 export function defineContractComponents(world: World) {
   return {
+    Round: (() => {
+      const tableId = new TableId("", "round");
+      return defineComponent(
+        world,
+        {
+          round: RecsType.Number,
+        },
+        {
+          metadata: {
+            contractId: tableId.toHexString(),
+            tableId: tableId.toString(),
+          },
+        }
+      );
+    })(),
     PositionTable: (() => {
       const tableId = new TableId("", "position");
       return defineComponent(
@@ -12,7 +27,25 @@ export function defineContractComponents(world: World) {
         {
           x: RecsType.Number,
           y: RecsType.Number,
-          z: RecsType.Number,
+        },
+        {
+          metadata: {
+            contractId: tableId.toHexString(),
+            tableId: tableId.toString(),
+          },
+        }
+      );
+    })(),
+    PlayerTable: (() => {
+      const tableId = new TableId("", "player");
+      return defineComponent(
+        world,
+        {
+          health: RecsType.Number,
+          ammo: RecsType.Number,
+          rockets: RecsType.Number,
+          lastDash: RecsType.Number,
+          charge: RecsType.Number,
         },
         {
           metadata: {

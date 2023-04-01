@@ -10,7 +10,7 @@ import "../Globals.sol";
 
 library AttackLibrary {
     // Function you can use to decrease charge if you're not updating other parts of the player data.
-    function discharge(bytes32 ID) public {
+    function discharge(bytes32 ID) internal {
         uint8 playerCharge = PlayerTable.getCharge(ID);
         if (playerCharge == CHARGING_TIME) return;
         PlayerTable.setCharge(ID, playerCharge + DISCHARGE_SPEED);

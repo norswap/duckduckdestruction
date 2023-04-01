@@ -16,14 +16,15 @@ contract MoveSystem is SystemPlus {
     PositionTableData memory position = PositionTable.get(ID);
     uint8 charge = PlayerTable.getCharge(ID);
     unchecked {
+      // Cooldown
       if (direction == Direction.UP) {
-        position.y++ % MAP_HEIGHT;
+        position.y = position.y - MOVE_DISTANCE;
       } else if (direction == Direction.DOWN) {
-        position.y-- % MAP_HEIGHT;
+        position.y = position.y + MOVE_DISTANCE;
       } else if (direction == Direction.LEFT) {
-        position.x-- % MAP_WIDTH;
+        position.x = position.x - MOVE_DISTANCE;
       } else if (direction == Direction.RIGHT) {
-        position.x++ % MAP_WIDTH;
+        position.x = position.x + MOVE_DISTANCE;
       }
     }
     PositionTable.set(ID, position);
