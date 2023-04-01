@@ -2,19 +2,25 @@
 pragma solidity >=0.8.0;
 import { AttackLibrary } from "../systems/AttackSystem.sol";
 import { PositionTable, PositionTableData } from "../tables/PositionTable.sol";
-import { PlayerTable } from "../tables/PlayerTable.sol";
-import { Round } from "../tables/Round.sol";
+import { PlayerTable, PlayerTableData } from "../tables/PlayerTable.sol";
+import { RoundTable } from "../tables/RoundTable.sol";
 import { LibMap } from "../libraries/LibMap.sol";
 import { SystemPlus } from "../libraries/SystemPlus.sol";
 import { Direction } from "../Types.sol";
 import "../Globals.sol";
 
+// TODO new round should be a copy of last round
+// TODO access control
+
+// TODO handle collisions
+// node_modules/@latticexyz/world/src/modules/keyswithvalue/getKeysWithValue.sol
+
+// TODO more dash directions?
+
 contract MoveSystem is SystemPlus {
 
-  function move(Direction direction) public {
-    bytes32 ID = senderID();
-    PositionTableData memory position = PositionTable.get(ID);
-    uint8 charge = PlayerTable.getCharge(ID);
+  function move(bytes32 ID, uint16 gameID, uint16 round, Direction direction) public {
+    PositionTableData memory position = PositionTable.get(ID, gameID, round);
     unchecked {
       if (direction == Direction.UP) {
         position.y++ % MAP_HEIGHT;
@@ -26,16 +32,17 @@ contract MoveSystem is SystemPlus {
         position.x++ % MAP_WIDTH;
       }
     }
-    PositionTable.set(ID, position);
-    AttackLibrary.discharge(ID);
+    PositionTable.set(ID, gameID, round, position);
+    // TODO this function is only used here, can inline it
+    AttackLibrary.discharge(ID, round, gameID);
   }
 
-  function dash(Direction direction) public {
-    bytes32 ID = senderID();
-    uint16 lastDash = PlayerTable.getLastDash(ID);
-    if (lastDash + DASH_COOLDOWN > Round.get()) return; // still on cooldown
+  function dash(bytes32 ID, uint16 gameID, uint16 round, Direction direction) public {
+    PlayerTableData memory player = PlayerTable.get(ID, gameID, round);
+    uint16 last = player.lastDash;
+    if (last + DASH_COOLDOWN > round && last != 0) return; // still on cooldown
 
-    PositionTableData memory position = PositionTable.get(ID);
+    PositionTableData memory position = PositionTable.get(ID, gameID, round);
     unchecked {
       if (direction == Direction.UP) {
         position.y += DASH_DISTANCE % MAP_HEIGHT;
@@ -47,7 +54,9 @@ contract MoveSystem is SystemPlus {
         position.x += DASH_DISTANCE % MAP_WIDTH;
       }
     }
-    PositionTable.set(ID, position);
-    AttackLibrary.discharge(ID);
+    PositionTable.set(ID, gameID, round, position);
+    player.lastDash = round;
+    if (player.charge != CHARGING_TIME) player.charge += DISCHARGE_SPEED;
+    PlayerTable.set(ID, gameID, round, player);
   }
 }

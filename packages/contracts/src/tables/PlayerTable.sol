@@ -42,8 +42,10 @@ library PlayerTable {
   }
 
   function getKeySchema() internal pure returns (Schema) {
-    SchemaType[] memory _schema = new SchemaType[](1);
+    SchemaType[] memory _schema = new SchemaType[](3);
     _schema[0] = SchemaType.BYTES32;
+    _schema[1] = SchemaType.UINT16;
+    _schema[2] = SchemaType.UINT16;
 
     return SchemaLib.encode(_schema);
   }
@@ -82,207 +84,252 @@ library PlayerTable {
   }
 
   /** Get health */
-  function getHealth(bytes32 key) internal view returns (uint16 health) {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
+  function getHealth(bytes32 player, uint16 game, uint16 round) internal view returns (uint16 health) {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _primaryKeys, 0);
     return (uint16(Bytes.slice2(_blob, 0)));
   }
 
   /** Get health (using the specified store) */
-  function getHealth(IStore _store, bytes32 key) internal view returns (uint16 health) {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
+  function getHealth(IStore _store, bytes32 player, uint16 game, uint16 round) internal view returns (uint16 health) {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
 
     bytes memory _blob = _store.getField(_tableId, _primaryKeys, 0);
     return (uint16(Bytes.slice2(_blob, 0)));
   }
 
   /** Set health */
-  function setHealth(bytes32 key, uint16 health) internal {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
+  function setHealth(bytes32 player, uint16 game, uint16 round, uint16 health) internal {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
 
     StoreSwitch.setField(_tableId, _primaryKeys, 0, abi.encodePacked((health)));
   }
 
   /** Set health (using the specified store) */
-  function setHealth(IStore _store, bytes32 key, uint16 health) internal {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
+  function setHealth(IStore _store, bytes32 player, uint16 game, uint16 round, uint16 health) internal {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
 
     _store.setField(_tableId, _primaryKeys, 0, abi.encodePacked((health)));
   }
 
   /** Get ammo */
-  function getAmmo(bytes32 key) internal view returns (uint16 ammo) {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
+  function getAmmo(bytes32 player, uint16 game, uint16 round) internal view returns (uint16 ammo) {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _primaryKeys, 1);
     return (uint16(Bytes.slice2(_blob, 0)));
   }
 
   /** Get ammo (using the specified store) */
-  function getAmmo(IStore _store, bytes32 key) internal view returns (uint16 ammo) {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
+  function getAmmo(IStore _store, bytes32 player, uint16 game, uint16 round) internal view returns (uint16 ammo) {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
 
     bytes memory _blob = _store.getField(_tableId, _primaryKeys, 1);
     return (uint16(Bytes.slice2(_blob, 0)));
   }
 
   /** Set ammo */
-  function setAmmo(bytes32 key, uint16 ammo) internal {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
+  function setAmmo(bytes32 player, uint16 game, uint16 round, uint16 ammo) internal {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
 
     StoreSwitch.setField(_tableId, _primaryKeys, 1, abi.encodePacked((ammo)));
   }
 
   /** Set ammo (using the specified store) */
-  function setAmmo(IStore _store, bytes32 key, uint16 ammo) internal {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
+  function setAmmo(IStore _store, bytes32 player, uint16 game, uint16 round, uint16 ammo) internal {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
 
     _store.setField(_tableId, _primaryKeys, 1, abi.encodePacked((ammo)));
   }
 
   /** Get rockets */
-  function getRockets(bytes32 key) internal view returns (uint16 rockets) {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
+  function getRockets(bytes32 player, uint16 game, uint16 round) internal view returns (uint16 rockets) {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _primaryKeys, 2);
     return (uint16(Bytes.slice2(_blob, 0)));
   }
 
   /** Get rockets (using the specified store) */
-  function getRockets(IStore _store, bytes32 key) internal view returns (uint16 rockets) {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
+  function getRockets(IStore _store, bytes32 player, uint16 game, uint16 round) internal view returns (uint16 rockets) {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
 
     bytes memory _blob = _store.getField(_tableId, _primaryKeys, 2);
     return (uint16(Bytes.slice2(_blob, 0)));
   }
 
   /** Set rockets */
-  function setRockets(bytes32 key, uint16 rockets) internal {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
+  function setRockets(bytes32 player, uint16 game, uint16 round, uint16 rockets) internal {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
 
     StoreSwitch.setField(_tableId, _primaryKeys, 2, abi.encodePacked((rockets)));
   }
 
   /** Set rockets (using the specified store) */
-  function setRockets(IStore _store, bytes32 key, uint16 rockets) internal {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
+  function setRockets(IStore _store, bytes32 player, uint16 game, uint16 round, uint16 rockets) internal {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
 
     _store.setField(_tableId, _primaryKeys, 2, abi.encodePacked((rockets)));
   }
 
   /** Get lastDash */
-  function getLastDash(bytes32 key) internal view returns (uint16 lastDash) {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
+  function getLastDash(bytes32 player, uint16 game, uint16 round) internal view returns (uint16 lastDash) {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _primaryKeys, 3);
     return (uint16(Bytes.slice2(_blob, 0)));
   }
 
   /** Get lastDash (using the specified store) */
-  function getLastDash(IStore _store, bytes32 key) internal view returns (uint16 lastDash) {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
+  function getLastDash(
+    IStore _store,
+    bytes32 player,
+    uint16 game,
+    uint16 round
+  ) internal view returns (uint16 lastDash) {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
 
     bytes memory _blob = _store.getField(_tableId, _primaryKeys, 3);
     return (uint16(Bytes.slice2(_blob, 0)));
   }
 
   /** Set lastDash */
-  function setLastDash(bytes32 key, uint16 lastDash) internal {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
+  function setLastDash(bytes32 player, uint16 game, uint16 round, uint16 lastDash) internal {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
 
     StoreSwitch.setField(_tableId, _primaryKeys, 3, abi.encodePacked((lastDash)));
   }
 
   /** Set lastDash (using the specified store) */
-  function setLastDash(IStore _store, bytes32 key, uint16 lastDash) internal {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
+  function setLastDash(IStore _store, bytes32 player, uint16 game, uint16 round, uint16 lastDash) internal {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
 
     _store.setField(_tableId, _primaryKeys, 3, abi.encodePacked((lastDash)));
   }
 
   /** Get charge */
-  function getCharge(bytes32 key) internal view returns (uint8 charge) {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
+  function getCharge(bytes32 player, uint16 game, uint16 round) internal view returns (uint8 charge) {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _primaryKeys, 4);
     return (uint8(Bytes.slice1(_blob, 0)));
   }
 
   /** Get charge (using the specified store) */
-  function getCharge(IStore _store, bytes32 key) internal view returns (uint8 charge) {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
+  function getCharge(IStore _store, bytes32 player, uint16 game, uint16 round) internal view returns (uint8 charge) {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
 
     bytes memory _blob = _store.getField(_tableId, _primaryKeys, 4);
     return (uint8(Bytes.slice1(_blob, 0)));
   }
 
   /** Set charge */
-  function setCharge(bytes32 key, uint8 charge) internal {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
+  function setCharge(bytes32 player, uint16 game, uint16 round, uint8 charge) internal {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
 
     StoreSwitch.setField(_tableId, _primaryKeys, 4, abi.encodePacked((charge)));
   }
 
   /** Set charge (using the specified store) */
-  function setCharge(IStore _store, bytes32 key, uint8 charge) internal {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
+  function setCharge(IStore _store, bytes32 player, uint16 game, uint16 round, uint8 charge) internal {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
 
     _store.setField(_tableId, _primaryKeys, 4, abi.encodePacked((charge)));
   }
 
   /** Get the full data */
-  function get(bytes32 key) internal view returns (PlayerTableData memory _table) {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
+  function get(bytes32 player, uint16 game, uint16 round) internal view returns (PlayerTableData memory _table) {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
 
     bytes memory _blob = StoreSwitch.getRecord(_tableId, _primaryKeys, getSchema());
     return decode(_blob);
   }
 
   /** Get the full data (using the specified store) */
-  function get(IStore _store, bytes32 key) internal view returns (PlayerTableData memory _table) {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
+  function get(
+    IStore _store,
+    bytes32 player,
+    uint16 game,
+    uint16 round
+  ) internal view returns (PlayerTableData memory _table) {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
 
     bytes memory _blob = _store.getRecord(_tableId, _primaryKeys, getSchema());
     return decode(_blob);
   }
 
   /** Set the full data using individual values */
-  function set(bytes32 key, uint16 health, uint16 ammo, uint16 rockets, uint16 lastDash, uint8 charge) internal {
-    bytes memory _data = encode(health, ammo, rockets, lastDash, charge);
-
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
-
-    StoreSwitch.setRecord(_tableId, _primaryKeys, _data);
-  }
-
-  /** Set the full data using individual values (using the specified store) */
   function set(
-    IStore _store,
-    bytes32 key,
+    bytes32 player,
+    uint16 game,
+    uint16 round,
     uint16 health,
     uint16 ammo,
     uint16 rockets,
@@ -291,20 +338,44 @@ library PlayerTable {
   ) internal {
     bytes memory _data = encode(health, ammo, rockets, lastDash, charge);
 
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
+
+    StoreSwitch.setRecord(_tableId, _primaryKeys, _data);
+  }
+
+  /** Set the full data using individual values (using the specified store) */
+  function set(
+    IStore _store,
+    bytes32 player,
+    uint16 game,
+    uint16 round,
+    uint16 health,
+    uint16 ammo,
+    uint16 rockets,
+    uint16 lastDash,
+    uint8 charge
+  ) internal {
+    bytes memory _data = encode(health, ammo, rockets, lastDash, charge);
+
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
 
     _store.setRecord(_tableId, _primaryKeys, _data);
   }
 
   /** Set the full data using the data struct */
-  function set(bytes32 key, PlayerTableData memory _table) internal {
-    set(key, _table.health, _table.ammo, _table.rockets, _table.lastDash, _table.charge);
+  function set(bytes32 player, uint16 game, uint16 round, PlayerTableData memory _table) internal {
+    set(player, game, round, _table.health, _table.ammo, _table.rockets, _table.lastDash, _table.charge);
   }
 
   /** Set the full data using the data struct (using the specified store) */
-  function set(IStore _store, bytes32 key, PlayerTableData memory _table) internal {
-    set(_store, key, _table.health, _table.ammo, _table.rockets, _table.lastDash, _table.charge);
+  function set(IStore _store, bytes32 player, uint16 game, uint16 round, PlayerTableData memory _table) internal {
+    set(_store, player, game, round, _table.health, _table.ammo, _table.rockets, _table.lastDash, _table.charge);
   }
 
   /** Decode the tightly packed blob using this table's schema */
@@ -332,17 +403,21 @@ library PlayerTable {
   }
 
   /* Delete all data for given keys */
-  function deleteRecord(bytes32 key) internal {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
+  function deleteRecord(bytes32 player, uint16 game, uint16 round) internal {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
 
     StoreSwitch.deleteRecord(_tableId, _primaryKeys);
   }
 
   /* Delete all data for given keys (using the specified store) */
-  function deleteRecord(IStore _store, bytes32 key) internal {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
+  function deleteRecord(IStore _store, bytes32 player, uint16 game, uint16 round) internal {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
 
     _store.deleteRecord(_tableId, _primaryKeys);
   }
