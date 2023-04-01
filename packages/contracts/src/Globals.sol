@@ -16,3 +16,10 @@ uint16 constant MOVE_DISTANCE = 1;
 
 uint16 constant DASH_DISTANCE = 3;
 uint8 constant DASH_COOLDOWN = 7;
+
+uint16 constant MIN_BOTS = 4;
+uint16 constant MAX_BOTS = 255;
+
+uint16 constant INITIAL_HEALTH = 10;
+uint16 constant INITIAL_AMMO = 20;
+uint16 constant INITIAL_ROCKETS = 3;

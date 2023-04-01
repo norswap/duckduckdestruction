@@ -17,20 +17,25 @@ import { EncodeArray } from "@latticexyz/store/src/tightcoder/EncodeArray.sol";
 import { Schema, SchemaLib } from "@latticexyz/store/src/Schema.sol";
 import { PackedCounter, PackedCounterLib } from "@latticexyz/store/src/PackedCounter.sol";
 
-uint256 constant _tableId = uint256(bytes32(abi.encodePacked(bytes16(""), bytes16("position"))));
-uint256 constant PositionTableTableId = _tableId;
+// Import user types
+import { ActionType, Direction } from "./../Types.sol";
 
-struct PositionTableData {
-  uint16 x;
-  uint16 y;
+uint256 constant _tableId = uint256(bytes32(abi.encodePacked(bytes16(""), bytes16("action"))));
+uint256 constant ActionTableTableId = _tableId;
+
+struct ActionTableData {
+  ActionType actionType;
+  Direction direction;
+  bytes32 targetID;
 }
 
-library PositionTable {
+library ActionTable {
   /** Get the table's schema */
   function getSchema() internal pure returns (Schema) {
-    SchemaType[] memory _schema = new SchemaType[](2);
-    _schema[0] = SchemaType.UINT16;
-    _schema[1] = SchemaType.UINT16;
+    SchemaType[] memory _schema = new SchemaType[](3);
+    _schema[0] = SchemaType.UINT8;
+    _schema[1] = SchemaType.UINT8;
+    _schema[2] = SchemaType.BYTES32;
 
     return SchemaLib.encode(_schema);
   }
@@ -46,10 +51,11 @@ library PositionTable {
 
   /** Get the table's metadata */
   function getMetadata() internal pure returns (string memory, string[] memory) {
-    string[] memory _fieldNames = new string[](2);
-    _fieldNames[0] = "x";
-    _fieldNames[1] = "y";
-    return ("PositionTable", _fieldNames);
+    string[] memory _fieldNames = new string[](3);
+    _fieldNames[0] = "actionType";
+    _fieldNames[1] = "direction";
+    _fieldNames[2] = "targetID";
+    return ("ActionTable", _fieldNames);
   }
 
   /** Register the table's schema */
@@ -74,92 +80,149 @@ library PositionTable {
     _store.setMetadata(_tableId, _tableName, _fieldNames);
   }
 
-  /** Get x */
-  function getX(bytes32 player, uint16 game, uint16 round) internal view returns (uint16 x) {
+  /** Get actionType */
+  function getActionType(bytes32 player, uint16 game, uint16 round) internal view returns (ActionType actionType) {
     bytes32[] memory _primaryKeys = new bytes32[](3);
     _primaryKeys[0] = bytes32((player));
     _primaryKeys[1] = bytes32(uint256((game)));
     _primaryKeys[2] = bytes32(uint256((round)));
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _primaryKeys, 0);
-    return (uint16(Bytes.slice2(_blob, 0)));
+    return ActionType(uint8(Bytes.slice1(_blob, 0)));
   }
 
-  /** Get x (using the specified store) */
-  function getX(IStore _store, bytes32 player, uint16 game, uint16 round) internal view returns (uint16 x) {
+  /** Get actionType (using the specified store) */
+  function getActionType(
+    IStore _store,
+    bytes32 player,
+    uint16 game,
+    uint16 round
+  ) internal view returns (ActionType actionType) {
     bytes32[] memory _primaryKeys = new bytes32[](3);
     _primaryKeys[0] = bytes32((player));
     _primaryKeys[1] = bytes32(uint256((game)));
     _primaryKeys[2] = bytes32(uint256((round)));
 
     bytes memory _blob = _store.getField(_tableId, _primaryKeys, 0);
-    return (uint16(Bytes.slice2(_blob, 0)));
+    return ActionType(uint8(Bytes.slice1(_blob, 0)));
   }
 
-  /** Set x */
-  function setX(bytes32 player, uint16 game, uint16 round, uint16 x) internal {
+  /** Set actionType */
+  function setActionType(bytes32 player, uint16 game, uint16 round, ActionType actionType) internal {
     bytes32[] memory _primaryKeys = new bytes32[](3);
     _primaryKeys[0] = bytes32((player));
     _primaryKeys[1] = bytes32(uint256((game)));
     _primaryKeys[2] = bytes32(uint256((round)));
 
-    StoreSwitch.setField(_tableId, _primaryKeys, 0, abi.encodePacked((x)));
+    StoreSwitch.setField(_tableId, _primaryKeys, 0, abi.encodePacked(uint8(actionType)));
   }
 
-  /** Set x (using the specified store) */
-  function setX(IStore _store, bytes32 player, uint16 game, uint16 round, uint16 x) internal {
+  /** Set actionType (using the specified store) */
+  function setActionType(IStore _store, bytes32 player, uint16 game, uint16 round, ActionType actionType) internal {
     bytes32[] memory _primaryKeys = new bytes32[](3);
     _primaryKeys[0] = bytes32((player));
     _primaryKeys[1] = bytes32(uint256((game)));
     _primaryKeys[2] = bytes32(uint256((round)));
 
-    _store.setField(_tableId, _primaryKeys, 0, abi.encodePacked((x)));
+    _store.setField(_tableId, _primaryKeys, 0, abi.encodePacked(uint8(actionType)));
   }
 
-  /** Get y */
-  function getY(bytes32 player, uint16 game, uint16 round) internal view returns (uint16 y) {
+  /** Get direction */
+  function getDirection(bytes32 player, uint16 game, uint16 round) internal view returns (Direction direction) {
     bytes32[] memory _primaryKeys = new bytes32[](3);
     _primaryKeys[0] = bytes32((player));
     _primaryKeys[1] = bytes32(uint256((game)));
     _primaryKeys[2] = bytes32(uint256((round)));
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _primaryKeys, 1);
-    return (uint16(Bytes.slice2(_blob, 0)));
+    return Direction(uint8(Bytes.slice1(_blob, 0)));
   }
 
-  /** Get y (using the specified store) */
-  function getY(IStore _store, bytes32 player, uint16 game, uint16 round) internal view returns (uint16 y) {
+  /** Get direction (using the specified store) */
+  function getDirection(
+    IStore _store,
+    bytes32 player,
+    uint16 game,
+    uint16 round
+  ) internal view returns (Direction direction) {
     bytes32[] memory _primaryKeys = new bytes32[](3);
     _primaryKeys[0] = bytes32((player));
     _primaryKeys[1] = bytes32(uint256((game)));
     _primaryKeys[2] = bytes32(uint256((round)));
 
     bytes memory _blob = _store.getField(_tableId, _primaryKeys, 1);
-    return (uint16(Bytes.slice2(_blob, 0)));
+    return Direction(uint8(Bytes.slice1(_blob, 0)));
   }
 
-  /** Set y */
-  function setY(bytes32 player, uint16 game, uint16 round, uint16 y) internal {
+  /** Set direction */
+  function setDirection(bytes32 player, uint16 game, uint16 round, Direction direction) internal {
     bytes32[] memory _primaryKeys = new bytes32[](3);
     _primaryKeys[0] = bytes32((player));
     _primaryKeys[1] = bytes32(uint256((game)));
     _primaryKeys[2] = bytes32(uint256((round)));
 
-    StoreSwitch.setField(_tableId, _primaryKeys, 1, abi.encodePacked((y)));
+    StoreSwitch.setField(_tableId, _primaryKeys, 1, abi.encodePacked(uint8(direction)));
   }
 
-  /** Set y (using the specified store) */
-  function setY(IStore _store, bytes32 player, uint16 game, uint16 round, uint16 y) internal {
+  /** Set direction (using the specified store) */
+  function setDirection(IStore _store, bytes32 player, uint16 game, uint16 round, Direction direction) internal {
     bytes32[] memory _primaryKeys = new bytes32[](3);
     _primaryKeys[0] = bytes32((player));
     _primaryKeys[1] = bytes32(uint256((game)));
     _primaryKeys[2] = bytes32(uint256((round)));
 
-    _store.setField(_tableId, _primaryKeys, 1, abi.encodePacked((y)));
+    _store.setField(_tableId, _primaryKeys, 1, abi.encodePacked(uint8(direction)));
+  }
+
+  /** Get targetID */
+  function getTargetID(bytes32 player, uint16 game, uint16 round) internal view returns (bytes32 targetID) {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
+
+    bytes memory _blob = StoreSwitch.getField(_tableId, _primaryKeys, 2);
+    return (Bytes.slice32(_blob, 0));
+  }
+
+  /** Get targetID (using the specified store) */
+  function getTargetID(
+    IStore _store,
+    bytes32 player,
+    uint16 game,
+    uint16 round
+  ) internal view returns (bytes32 targetID) {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
+
+    bytes memory _blob = _store.getField(_tableId, _primaryKeys, 2);
+    return (Bytes.slice32(_blob, 0));
+  }
+
+  /** Set targetID */
+  function setTargetID(bytes32 player, uint16 game, uint16 round, bytes32 targetID) internal {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
+
+    StoreSwitch.setField(_tableId, _primaryKeys, 2, abi.encodePacked((targetID)));
+  }
+
+  /** Set targetID (using the specified store) */
+  function setTargetID(IStore _store, bytes32 player, uint16 game, uint16 round, bytes32 targetID) internal {
+    bytes32[] memory _primaryKeys = new bytes32[](3);
+    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[1] = bytes32(uint256((game)));
+    _primaryKeys[2] = bytes32(uint256((round)));
+
+    _store.setField(_tableId, _primaryKeys, 2, abi.encodePacked((targetID)));
   }
 
   /** Get the full data */
-  function get(bytes32 player, uint16 game, uint16 round) internal view returns (PositionTableData memory _table) {
+  function get(bytes32 player, uint16 game, uint16 round) internal view returns (ActionTableData memory _table) {
     bytes32[] memory _primaryKeys = new bytes32[](3);
     _primaryKeys[0] = bytes32((player));
     _primaryKeys[1] = bytes32(uint256((game)));
@@ -175,7 +238,7 @@ library PositionTable {
     bytes32 player,
     uint16 game,
     uint16 round
-  ) internal view returns (PositionTableData memory _table) {
+  ) internal view returns (ActionTableData memory _table) {
     bytes32[] memory _primaryKeys = new bytes32[](3);
     _primaryKeys[0] = bytes32((player));
     _primaryKeys[1] = bytes32(uint256((game)));
@@ -186,8 +249,15 @@ library PositionTable {
   }
 
   /** Set the full data using individual values */
-  function set(bytes32 player, uint16 game, uint16 round, uint16 x, uint16 y) internal {
-    bytes memory _data = encode(x, y);
+  function set(
+    bytes32 player,
+    uint16 game,
+    uint16 round,
+    ActionType actionType,
+    Direction direction,
+    bytes32 targetID
+  ) internal {
+    bytes memory _data = encode(actionType, direction, targetID);
 
     bytes32[] memory _primaryKeys = new bytes32[](3);
     _primaryKeys[0] = bytes32((player));
@@ -198,8 +268,16 @@ library PositionTable {
   }
 
   /** Set the full data using individual values (using the specified store) */
-  function set(IStore _store, bytes32 player, uint16 game, uint16 round, uint16 x, uint16 y) internal {
-    bytes memory _data = encode(x, y);
+  function set(
+    IStore _store,
+    bytes32 player,
+    uint16 game,
+    uint16 round,
+    ActionType actionType,
+    Direction direction,
+    bytes32 targetID
+  ) internal {
+    bytes memory _data = encode(actionType, direction, targetID);
 
     bytes32[] memory _primaryKeys = new bytes32[](3);
     _primaryKeys[0] = bytes32((player));
@@ -210,25 +288,27 @@ library PositionTable {
   }
 
   /** Set the full data using the data struct */
-  function set(bytes32 player, uint16 game, uint16 round, PositionTableData memory _table) internal {
-    set(player, game, round, _table.x, _table.y);
+  function set(bytes32 player, uint16 game, uint16 round, ActionTableData memory _table) internal {
+    set(player, game, round, _table.actionType, _table.direction, _table.targetID);
   }
 
   /** Set the full data using the data struct (using the specified store) */
-  function set(IStore _store, bytes32 player, uint16 game, uint16 round, PositionTableData memory _table) internal {
-    set(_store, player, game, round, _table.x, _table.y);
+  function set(IStore _store, bytes32 player, uint16 game, uint16 round, ActionTableData memory _table) internal {
+    set(_store, player, game, round, _table.actionType, _table.direction, _table.targetID);
   }
 
   /** Decode the tightly packed blob using this table's schema */
-  function decode(bytes memory _blob) internal pure returns (PositionTableData memory _table) {
-    _table.x = (uint16(Bytes.slice2(_blob, 0)));
+  function decode(bytes memory _blob) internal pure returns (ActionTableData memory _table) {
+    _table.actionType = ActionType(uint8(Bytes.slice1(_blob, 0)));
 
-    _table.y = (uint16(Bytes.slice2(_blob, 2)));
+    _table.direction = Direction(uint8(Bytes.slice1(_blob, 1)));
+
+    _table.targetID = (Bytes.slice32(_blob, 2));
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(uint16 x, uint16 y) internal view returns (bytes memory) {
-    return abi.encodePacked(x, y);
+  function encode(ActionType actionType, Direction direction, bytes32 targetID) internal view returns (bytes memory) {
+    return abi.encodePacked(actionType, direction, targetID);
   }
 
   /* Delete all data for given keys */

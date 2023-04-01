@@ -6,7 +6,7 @@ pragma solidity >=0.8.0;
 import { Direction } from "./../systems/MoveSystem.sol";
 
 interface IMoveSystem {
-  function move(Direction direction) external;
+  function move(bytes32 ID, uint16 gameID, uint16 round, Direction direction) external;
 
-  function dash(Direction direction) external;
+  function dash(bytes32 ID, uint16 gameID, uint16 round, Direction direction) external;
 }
