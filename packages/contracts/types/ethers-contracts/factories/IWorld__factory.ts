@@ -85,6 +85,39 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "uint16",
+        name: "gameID",
+        type: "uint16",
+      },
+      {
+        internalType: "address",
+        name: "bot",
+        type: "address",
+      },
+    ],
+    name: "addBot",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "ID",
+        type: "bytes32",
+      },
+      {
+        internalType: "uint16",
+        name: "gameID",
+        type: "uint16",
+      },
+      {
+        internalType: "uint16",
+        name: "round",
+        type: "uint16",
+      },
+      {
         internalType: "bytes32",
         name: "targetID",
         type: "bytes32",
@@ -125,14 +158,58 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "ID",
+        type: "bytes32",
+      },
+      {
+        internalType: "uint16",
+        name: "gameID",
+        type: "uint16",
+      },
+      {
+        internalType: "uint16",
+        name: "round",
+        type: "uint16",
+      },
+    ],
     name: "charge",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
   {
+    inputs: [],
+    name: "createGame",
+    outputs: [
+      {
+        internalType: "uint16",
+        name: "gameID",
+        type: "uint16",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [
+      {
+        internalType: "bytes32",
+        name: "ID",
+        type: "bytes32",
+      },
+      {
+        internalType: "uint16",
+        name: "gameID",
+        type: "uint16",
+      },
+      {
+        internalType: "uint16",
+        name: "round",
+        type: "uint16",
+      },
       {
         internalType: "enum Direction",
         name: "direction",
@@ -392,6 +469,21 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "bytes32",
+        name: "ID",
+        type: "bytes32",
+      },
+      {
+        internalType: "uint16",
+        name: "gameID",
+        type: "uint16",
+      },
+      {
+        internalType: "uint16",
+        name: "round",
+        type: "uint16",
+      },
+      {
         internalType: "enum Direction",
         name: "direction",
         type: "uint8",
@@ -404,6 +496,34 @@ const _abi = [
   },
   {
     inputs: [
+      {
+        internalType: "uint16",
+        name: "gameID",
+        type: "uint16",
+      },
+    ],
+    name: "nextRound",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "ID",
+        type: "bytes32",
+      },
+      {
+        internalType: "uint16",
+        name: "gameID",
+        type: "uint16",
+      },
+      {
+        internalType: "uint16",
+        name: "round",
+        type: "uint16",
+      },
       {
         internalType: "bytes32",
         name: "targetID",
@@ -679,11 +799,74 @@ const _abi = [
     inputs: [
       {
         internalType: "bytes32",
+        name: "ID",
+        type: "bytes32",
+      },
+      {
+        internalType: "uint16",
+        name: "gameID",
+        type: "uint16",
+      },
+      {
+        internalType: "uint16",
+        name: "round",
+        type: "uint16",
+      },
+      {
+        internalType: "bytes32",
         name: "targetID",
         type: "bytes32",
       },
     ],
     name: "shoot",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint16",
+        name: "gameID",
+        type: "uint16",
+      },
+    ],
+    name: "startGame",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint16",
+        name: "gameID",
+        type: "uint16",
+      },
+      {
+        components: [
+          {
+            internalType: "enum ActionType",
+            name: "actionType",
+            type: "uint8",
+          },
+          {
+            internalType: "enum Direction",
+            name: "direction",
+            type: "uint8",
+          },
+          {
+            internalType: "bytes32",
+            name: "targetID",
+            type: "bytes32",
+          },
+        ],
+        internalType: "struct ActionTableData",
+        name: "action",
+        type: "tuple",
+      },
+    ],
+    name: "submitAction",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

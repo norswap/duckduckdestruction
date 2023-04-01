@@ -1,13 +1,9 @@
-import { useRef, useState } from "react";
-import { loadTexture } from '../utils';
+import { useRef, useState, useMemo } from "react";
 import { ThreeElements } from '@react-three/fiber';
+import { type Texture } from 'three';
 
-export function Tile(props: ThreeElements["mesh"] & { position: { x: number, y: number } }) {
+export function Tile(props: ThreeElements["mesh"] & { position: { x: number, y: number } } & { texture: Texture }) {
   const ref = useRef<THREE.Mesh>(null!);
-
-  const textureName = Math.floor(Math.random() * (8 - 1 + 1) + 1);
-
-  const texture = loadTexture(textureName + ".png");
 
   return (
     <mesh
@@ -15,9 +11,7 @@ export function Tile(props: ThreeElements["mesh"] & { position: { x: number, y: 
       position={[props.position.x, 0, props.position.y]}
       >
       <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial
-        map={texture}
-      />
+      <meshStandardMaterial map={props.texture} />
     </mesh>
   );
 }

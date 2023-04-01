@@ -5,7 +5,40 @@ import { defineComponent, Type as RecsType, World } from "@latticexyz/recs";
 
 export function defineContractComponents(world: World) {
   return {
-    Round: (() => {
+    GlobalTable: (() => {
+      const tableId = new TableId("", "GlobalTable");
+      return defineComponent(
+        world,
+        {
+          nextGameID: RecsType.Number,
+        },
+        {
+          metadata: {
+            contractId: tableId.toHexString(),
+            tableId: tableId.toString(),
+          },
+        }
+      );
+    })(),
+    GameTable: (() => {
+      const tableId = new TableId("", "GameTable");
+      return defineComponent(
+        world,
+        {
+          creator: RecsType.String,
+          round: RecsType.Number,
+          alive: RecsType.Number,
+          bots: RecsType.StringArray,
+        },
+        {
+          metadata: {
+            contractId: tableId.toHexString(),
+            tableId: tableId.toString(),
+          },
+        }
+      );
+    })(),
+    RoundTable: (() => {
       const tableId = new TableId("", "round");
       return defineComponent(
         world,
@@ -46,6 +79,23 @@ export function defineContractComponents(world: World) {
           rockets: RecsType.Number,
           lastDash: RecsType.Number,
           charge: RecsType.Number,
+        },
+        {
+          metadata: {
+            contractId: tableId.toHexString(),
+            tableId: tableId.toString(),
+          },
+        }
+      );
+    })(),
+    ActionTable: (() => {
+      const tableId = new TableId("", "action");
+      return defineComponent(
+        world,
+        {
+          actionType: RecsType.Number,
+          direction: RecsType.Number,
+          targetID: RecsType.String,
         },
         {
           metadata: {
