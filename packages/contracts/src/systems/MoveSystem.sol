@@ -5,7 +5,6 @@ import { PositionTable, PositionTableData } from "../tables/PositionTable.sol";
 import { World } from "@latticexyz/world/src/World.sol";
 import { LibMap } from "../libraries/LibMap.sol";
 
-uint256 constant ID = uint256(keccak256("system.Move"));
 
 contract MoveSystem is System {
   function move(int32 x, int32 y, int32 z) public {
