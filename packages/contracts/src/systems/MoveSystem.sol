@@ -1,20 +1,53 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
-import { System } from "@latticexyz/world/src/System.sol";
+import { AttackLibrary } from "../systems/AttackSystem.sol";
 import { PositionTable, PositionTableData } from "../tables/PositionTable.sol";
-import { World } from "@latticexyz/world/src/World.sol";
+import { PlayerTable } from "../tables/PlayerTable.sol";
+import { Round } from "../tables/Round.sol";
 import { LibMap } from "../libraries/LibMap.sol";
+import { SystemPlus } from "../libraries/SystemPlus.sol";
+import { Direction } from "../Types.sol";
+import "../Globals.sol";
 
+contract MoveSystem is SystemPlus {
 
-contract MoveSystem is System {
-  function move(int32 x, int32 y, int32 z) public {
-    bytes32 entityId = bytes32(uint256(uint160((_msgSender()))));
+  function move(Direction direction) public {
+    bytes32 ID = senderID();
+    PositionTableData memory position = PositionTable.get(ID);
+    uint8 charge = PlayerTable.getCharge(ID);
+    unchecked {
+      if (direction == Direction.UP) {
+        position.y++ % MAP_HEIGHT;
+      } else if (direction == Direction.DOWN) {
+        position.y-- % MAP_HEIGHT;
+      } else if (direction == Direction.LEFT) {
+        position.x-- % MAP_WIDTH;
+      } else if (direction == Direction.RIGHT) {
+        position.x++ % MAP_WIDTH;
+      }
+    }
+    PositionTable.set(ID, position);
+    AttackLibrary.discharge(ID);
+  }
 
-    PositionTableData memory position = PositionTable.get(entityId);
-    PositionTableData memory newPosition = PositionTableData(x, y, z);
+  function dash(Direction direction) public {
+    bytes32 ID = senderID();
+    uint16 lastDash = PlayerTable.getLastDash(ID);
+    if (lastDash + DASH_COOLDOWN > Round.get()) return; // still on cooldown
 
-    require(LibMap.distance(position, newPosition) == 1, "can only move to adjacent spaces");
-
-    PositionTable.set(entityId, newPosition);
+    PositionTableData memory position = PositionTable.get(ID);
+    unchecked {
+      if (direction == Direction.UP) {
+        position.y += DASH_DISTANCE % MAP_HEIGHT;
+      } else if (direction == Direction.DOWN) {
+        position.y -= DASH_DISTANCE % MAP_HEIGHT;
+      } else if (direction == Direction.LEFT) {
+        position.x -= DASH_DISTANCE % MAP_WIDTH;
+      } else if (direction == Direction.RIGHT) {
+        position.x += DASH_DISTANCE % MAP_WIDTH;
+      }
+    }
+    PositionTable.set(ID, position);
+    AttackLibrary.discharge(ID);
   }
 }
