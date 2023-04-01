@@ -21,18 +21,16 @@ uint256 constant _tableId = uint256(bytes32(abi.encodePacked(bytes16(""), bytes1
 uint256 constant PositionTableTableId = _tableId;
 
 struct PositionTableData {
-  int32 x;
-  int32 y;
-  int32 z;
+  uint16 x;
+  uint16 y;
 }
 
 library PositionTable {
   /** Get the table's schema */
   function getSchema() internal pure returns (Schema) {
-    SchemaType[] memory _schema = new SchemaType[](3);
-    _schema[0] = SchemaType.INT32;
-    _schema[1] = SchemaType.INT32;
-    _schema[2] = SchemaType.INT32;
+    SchemaType[] memory _schema = new SchemaType[](2);
+    _schema[0] = SchemaType.UINT16;
+    _schema[1] = SchemaType.UINT16;
 
     return SchemaLib.encode(_schema);
   }
@@ -46,10 +44,9 @@ library PositionTable {
 
   /** Get the table's metadata */
   function getMetadata() internal pure returns (string memory, string[] memory) {
-    string[] memory _fieldNames = new string[](3);
+    string[] memory _fieldNames = new string[](2);
     _fieldNames[0] = "x";
     _fieldNames[1] = "y";
-    _fieldNames[2] = "z";
     return ("PositionTable", _fieldNames);
   }
 
@@ -76,25 +73,25 @@ library PositionTable {
   }
 
   /** Get x */
-  function getX(bytes32 key) internal view returns (int32 x) {
+  function getX(bytes32 key) internal view returns (uint16 x) {
     bytes32[] memory _primaryKeys = new bytes32[](1);
     _primaryKeys[0] = bytes32((key));
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _primaryKeys, 0);
-    return (int32(uint32(Bytes.slice4(_blob, 0))));
+    return (uint16(Bytes.slice2(_blob, 0)));
   }
 
   /** Get x (using the specified store) */
-  function getX(IStore _store, bytes32 key) internal view returns (int32 x) {
+  function getX(IStore _store, bytes32 key) internal view returns (uint16 x) {
     bytes32[] memory _primaryKeys = new bytes32[](1);
     _primaryKeys[0] = bytes32((key));
 
     bytes memory _blob = _store.getField(_tableId, _primaryKeys, 0);
-    return (int32(uint32(Bytes.slice4(_blob, 0))));
+    return (uint16(Bytes.slice2(_blob, 0)));
   }
 
   /** Set x */
-  function setX(bytes32 key, int32 x) internal {
+  function setX(bytes32 key, uint16 x) internal {
     bytes32[] memory _primaryKeys = new bytes32[](1);
     _primaryKeys[0] = bytes32((key));
 
@@ -102,7 +99,7 @@ library PositionTable {
   }
 
   /** Set x (using the specified store) */
-  function setX(IStore _store, bytes32 key, int32 x) internal {
+  function setX(IStore _store, bytes32 key, uint16 x) internal {
     bytes32[] memory _primaryKeys = new bytes32[](1);
     _primaryKeys[0] = bytes32((key));
 
@@ -110,25 +107,25 @@ library PositionTable {
   }
 
   /** Get y */
-  function getY(bytes32 key) internal view returns (int32 y) {
+  function getY(bytes32 key) internal view returns (uint16 y) {
     bytes32[] memory _primaryKeys = new bytes32[](1);
     _primaryKeys[0] = bytes32((key));
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _primaryKeys, 1);
-    return (int32(uint32(Bytes.slice4(_blob, 0))));
+    return (uint16(Bytes.slice2(_blob, 0)));
   }
 
   /** Get y (using the specified store) */
-  function getY(IStore _store, bytes32 key) internal view returns (int32 y) {
+  function getY(IStore _store, bytes32 key) internal view returns (uint16 y) {
     bytes32[] memory _primaryKeys = new bytes32[](1);
     _primaryKeys[0] = bytes32((key));
 
     bytes memory _blob = _store.getField(_tableId, _primaryKeys, 1);
-    return (int32(uint32(Bytes.slice4(_blob, 0))));
+    return (uint16(Bytes.slice2(_blob, 0)));
   }
 
   /** Set y */
-  function setY(bytes32 key, int32 y) internal {
+  function setY(bytes32 key, uint16 y) internal {
     bytes32[] memory _primaryKeys = new bytes32[](1);
     _primaryKeys[0] = bytes32((key));
 
@@ -136,45 +133,11 @@ library PositionTable {
   }
 
   /** Set y (using the specified store) */
-  function setY(IStore _store, bytes32 key, int32 y) internal {
+  function setY(IStore _store, bytes32 key, uint16 y) internal {
     bytes32[] memory _primaryKeys = new bytes32[](1);
     _primaryKeys[0] = bytes32((key));
 
     _store.setField(_tableId, _primaryKeys, 1, abi.encodePacked((y)));
-  }
-
-  /** Get z */
-  function getZ(bytes32 key) internal view returns (int32 z) {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
-
-    bytes memory _blob = StoreSwitch.getField(_tableId, _primaryKeys, 2);
-    return (int32(uint32(Bytes.slice4(_blob, 0))));
-  }
-
-  /** Get z (using the specified store) */
-  function getZ(IStore _store, bytes32 key) internal view returns (int32 z) {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
-
-    bytes memory _blob = _store.getField(_tableId, _primaryKeys, 2);
-    return (int32(uint32(Bytes.slice4(_blob, 0))));
-  }
-
-  /** Set z */
-  function setZ(bytes32 key, int32 z) internal {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
-
-    StoreSwitch.setField(_tableId, _primaryKeys, 2, abi.encodePacked((z)));
-  }
-
-  /** Set z (using the specified store) */
-  function setZ(IStore _store, bytes32 key, int32 z) internal {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32((key));
-
-    _store.setField(_tableId, _primaryKeys, 2, abi.encodePacked((z)));
   }
 
   /** Get the full data */
@@ -196,8 +159,8 @@ library PositionTable {
   }
 
   /** Set the full data using individual values */
-  function set(bytes32 key, int32 x, int32 y, int32 z) internal {
-    bytes memory _data = encode(x, y, z);
+  function set(bytes32 key, uint16 x, uint16 y) internal {
+    bytes memory _data = encode(x, y);
 
     bytes32[] memory _primaryKeys = new bytes32[](1);
     _primaryKeys[0] = bytes32((key));
@@ -206,8 +169,8 @@ library PositionTable {
   }
 
   /** Set the full data using individual values (using the specified store) */
-  function set(IStore _store, bytes32 key, int32 x, int32 y, int32 z) internal {
-    bytes memory _data = encode(x, y, z);
+  function set(IStore _store, bytes32 key, uint16 x, uint16 y) internal {
+    bytes memory _data = encode(x, y);
 
     bytes32[] memory _primaryKeys = new bytes32[](1);
     _primaryKeys[0] = bytes32((key));
@@ -217,26 +180,24 @@ library PositionTable {
 
   /** Set the full data using the data struct */
   function set(bytes32 key, PositionTableData memory _table) internal {
-    set(key, _table.x, _table.y, _table.z);
+    set(key, _table.x, _table.y);
   }
 
   /** Set the full data using the data struct (using the specified store) */
   function set(IStore _store, bytes32 key, PositionTableData memory _table) internal {
-    set(_store, key, _table.x, _table.y, _table.z);
+    set(_store, key, _table.x, _table.y);
   }
 
   /** Decode the tightly packed blob using this table's schema */
   function decode(bytes memory _blob) internal pure returns (PositionTableData memory _table) {
-    _table.x = (int32(uint32(Bytes.slice4(_blob, 0))));
+    _table.x = (uint16(Bytes.slice2(_blob, 0)));
 
-    _table.y = (int32(uint32(Bytes.slice4(_blob, 4))));
-
-    _table.z = (int32(uint32(Bytes.slice4(_blob, 8))));
+    _table.y = (uint16(Bytes.slice2(_blob, 2)));
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(int32 x, int32 y, int32 z) internal view returns (bytes memory) {
-    return abi.encodePacked(x, y, z);
+  function encode(uint16 x, uint16 y) internal view returns (bytes memory) {
+    return abi.encodePacked(x, y);
   }
 
   /* Delete all data for given keys */

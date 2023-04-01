@@ -6,6 +6,7 @@
   "scripts": {
     "----- EXTERNAL -----": "---------------------------",
     "initialize": "yarn tablegen && yarn build && yarn worldgen && yarn worldtypes && yarn tsgen",
+    "gen": "yarn tablegen && yarn worldgen && yarn worldtypes",
     "devnode": "mud devnode",
     "build": "forge clean && forge build",
     "test": "mud test-v2",

@@ -8,15 +8,33 @@ export default mudConfig({
     },
   },
   tables: {
+    Round : {
+      fileSelector: "round",
+      primaryKeys: {},
+      schema: {
+        round: "uint16"
+      }
+    },
     PositionTable: {
       fileSelector: "position",
       schema: {
-        x: "int32",
-        y: "int32",
-        z: "int32",
+        x: "uint16",
+        y: "uint16"
       },
-      storeArgument: true,
     },
+    PlayerTable: {
+      fileSelector: "player",
+      schema: {
+        health: "uint16",
+        ammo: "uint16",
+        rockets: "uint16",
+        lastDash: "uint16",
+        charge: "uint8"
+      }
+    },
+  },
+  enums: {
+    Direction: [ "LEFT", "RIGHT", "UP", "DOWN" ]
   },
   modules: [
     {

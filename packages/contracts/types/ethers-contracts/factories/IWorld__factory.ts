@@ -85,6 +85,19 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "bytes32",
+        name: "targetID",
+        type: "bytes32",
+      },
+    ],
+    name: "blast",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "bytes16",
         name: "namespace",
         type: "bytes16",
@@ -108,6 +121,26 @@ const _abi = [
         type: "bytes",
       },
     ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "charge",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "enum Direction",
+        name: "direction",
+        type: "uint8",
+      },
+    ],
+    name: "dash",
+    outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
@@ -148,6 +181,19 @@ const _abi = [
       },
     ],
     name: "deleteRecord",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "ID",
+        type: "bytes32",
+      },
+    ],
+    name: "discharge",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -314,19 +360,6 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [],
-    name: "increment",
-    outputs: [
-      {
-        internalType: "uint32",
-        name: "",
-        type: "uint32",
-      },
-    ],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
     inputs: [
       {
         internalType: "contract IModule",
@@ -372,22 +405,25 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "int32",
-        name: "x",
-        type: "int32",
-      },
-      {
-        internalType: "int32",
-        name: "y",
-        type: "int32",
-      },
-      {
-        internalType: "int32",
-        name: "z",
-        type: "int32",
+        internalType: "enum Direction",
+        name: "direction",
+        type: "uint8",
       },
     ],
     name: "move",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "targetID",
+        type: "bytes32",
+      },
+    ],
+    name: "punch",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -648,6 +684,19 @@ const _abi = [
       },
     ],
     name: "setRecord",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "targetID",
+        type: "bytes32",
+      },
+    ],
+    name: "shoot",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
