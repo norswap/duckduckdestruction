@@ -15,8 +15,9 @@ import { ActionType, Direction } from "src/Types.sol";
 import "src/Globals.sol";
 
 import { console2 } from "forge-std/console2.sol";
+import "../bots/ExampleBot.sol";
 
-error CreatorOnly();
+    error CreatorOnly();
 error LateJoin();
 error NotEnoughBots();
 error TooManyBots();
@@ -27,14 +28,23 @@ uint16 constant GAME_NOT_STARTED = type(uint16).max;
 
 contract GameSystem is SystemPlus {
 
+    function tmpDeployBots(uint16 gameID) external {
+        for (uint256 i = 0; i < 6; i++) {
+            address bot = address(new ExampleBot());
+            addBot(gameID, bot);
+        }
+    }
+
     function createGame() external returns(uint16 gameID) {
         gameID = GlobalTable.get();
         GlobalTable.set(gameID + 1);
+        GameTable.setId(gameID, gameID);
         GameTable.setCreator(gameID, _msgSender());
         GameTable.setRound(gameID, GAME_NOT_STARTED);
     }
 
-    function addBot(uint16 gameID, address bot) external {
+    // TODO revert to external after tmp functions are removed
+    function addBot(uint16 gameID, address bot) public {
         // Creator-only for now.
         if (_msgSender() != GameTable.getCreator(gameID))
             revert CreatorOnly();

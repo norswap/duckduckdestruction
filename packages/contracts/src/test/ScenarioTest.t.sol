@@ -30,9 +30,6 @@ contract ScenarioTest is MudV2Test {
 
         for (uint256 i = 0; i < length; i++) {
             bots[i] = address(new ExampleBot());
-            // TODO not needed
-            world.grantAccess("", bots[i]);
-            world.grantAccess("", "SubmitSystem", bots[i]);
             console.log("ExampleBot address", bots[i]);
         }
         vm.stopPrank();

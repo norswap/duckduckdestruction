@@ -20,6 +20,7 @@ export default mudConfig({
         gameID: "uint16",
       },
       schema: {
+        id: "uint16",
         creator: "address",
         round: "uint16",
         numBots: "uint16",
