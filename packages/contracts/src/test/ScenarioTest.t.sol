@@ -7,11 +7,13 @@ import { IBaseWorld } from "@latticexyz/world/src/interfaces/IBaseWorld.sol";
 import { IWorld } from "src/world/IWorld.sol";
 import { ReversePositionTableHook } from "src/hooks/ReversePositionTableHook.sol";
 import { ExampleBot } from "src/bots/ExampleBot.sol";
+import { GameTable } from "src/tables/GameTable.sol";
 
 contract ScenarioTest is MudV2Test {
     IWorld world;
-    uint256 length = 6;
-    address[] bots = new address[](length);
+    uint256 numBots = 20;
+    uint256 rounds = 20;
+    address[] bots = new address[](numBots);
 
     function setUp() public override {
         super.setUp();
@@ -28,7 +30,7 @@ contract ScenarioTest is MudV2Test {
         baseWorld.registerHook("", "position", hook);
         world.grantAccess("", "reversePosition", hook);
 
-        for (uint256 i = 0; i < length; i++) {
+        for (uint256 i = 0; i < numBots; i++) {
             bots[i] = address(new ExampleBot());
             console.log("ExampleBot address", bots[i]);
         }
@@ -38,11 +40,14 @@ contract ScenarioTest is MudV2Test {
     function testRounds() public {
         uint256 rounds = 10;
         uint16 gameID = world.createGame();
-        for (uint256 i = 0; i < length; i++) {
+        for (uint256 i = 0; i < numBots; i++) {
             world.addBot(gameID, bots[i]);
         }
         world.startGame(gameID);
         for (uint256 i = 0; i < rounds; i++) {
+            uint16 alive = GameTable.getAlive(world, gameID);
+            console2.log("alive", alive);
+            if (alive <= 1) break;
             world.nextRound(gameID);
         }
     }

@@ -7,8 +7,12 @@ import { IBaseWorld } from "@latticexyz/world/src/interfaces/IBaseWorld.sol";
 import { ReversePositionTableHook } from "src/hooks/ReversePositionTableHook.sol";
 import { ExampleBot } from "src/bots/ExampleBot.sol";
 import { IWorld } from "src/world/IWorld.sol";
+import { GameTable } from "src/tables/GameTable.sol";
 
 contract PostDeploy is Script {
+
+  uint256 numBots = 16;
+  uint256 rounds = 16;
 
   function run(address worldAddress) external {
     uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
@@ -28,23 +32,26 @@ contract PostDeploy is Script {
     IWorld world = IWorld(worldAddress);
     world.grantAccess("", "reversePosition", hook);
 
-    uint256 length = 8;
-    address[] memory bots = new address[](length);
-    for (uint256 i = 0; i < length; i++) {
+    // NOTE(norswap): For running tests, comment below this line.
+
+    address[] memory bots = new address[](numBots);
+    for (uint256 i = 0; i < numBots; i++) {
       bots[i] = address(new ExampleBot());
       console.log("ExampleBot address", bots[i]);
     }
 
-    uint256 rounds = 10;
     uint16 gameID = world.createGame();
-    for (uint256 i = 0; i < length; i++) {
+    for (uint256 i = 0; i < numBots; i++) {
       world.addBot(gameID, bots[i]);
     }
     world.startGame(gameID);
     for (uint256 i = 0; i < rounds; i++) {
+      uint16 alive = GameTable.getAlive(world, gameID);
+      console2.log("alive", alive);
+      if (alive <= 1) break;
       world.nextRound(gameID);
     }
-
+    console2.log("game over");
     vm.stopBroadcast();
   }
 }
