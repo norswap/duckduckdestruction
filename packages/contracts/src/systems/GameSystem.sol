@@ -1,65 +1,83 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import { getKeysWithValue } from "@latticexyz/world/src/modules/keyswithvalue/getKeysWithValue.sol";
 import { SystemPlus } from "src/libraries/SystemPlus.sol";
 import { IWorld } from "src/world/IWorld.sol";
 import { GlobalTable } from "src/tables/GlobalTable.sol";
 import { GameTable } from "src/tables/GameTable.sol";
+import { BotTable } from "src/tables/BotTable.sol";
 import { ActionTable, ActionTableData } from "src/tables/ActionTable.sol";
-import { PositionTable, PositionTableData, _tableId as positionTableID } from "src/tables/PositionTable.sol";
-import { PlayerTable, PlayerTableData } from "src/tables/PlayerTable.sol";
+import { PositionTable, PositionTableData } from "src/tables/PositionTable.sol";
+import { ReversePositionTable } from "src/tables/ReversePositionTable.sol";
+import { AttributeTable, AttributeTableData } from "src/tables/AttributeTable.sol";
 import { Bot } from "src/bots/Bot.sol";
 import { ActionType, Direction } from "src/Types.sol";
 import "src/Globals.sol";
 
+// TODO remove
+import { console } from "forge-std/console.sol";
+
 error CreatorOnly();
+error LateJoin();
 error NotEnoughBots();
 error TooManyBots();
 error GameOver();
+error ItsBeenMuchTooLongIFeelItComingOn();
+
+uint16 constant GAME_NOT_STARTED = type(uint16).max;
 
 contract GameSystem is SystemPlus {
 
     function createGame() external returns(uint16 gameID) {
+        console.log("createGame", _msgSender());
         gameID = GlobalTable.get();
         GlobalTable.set(gameID + 1);
+        GameTable.setCreator(gameID, _msgSender());
+        GameTable.setRound(gameID, GAME_NOT_STARTED);
+        console.log("gameID", gameID);
     }
 
     function addBot(uint16 gameID, address bot) external {
-        GameTable.pushBots(gameID, bytes20(bot));
+        // Creator-only for now.
+        if (_msgSender() != GameTable.getCreator(gameID))
+            revert CreatorOnly();
+        if (GameTable.getRound(gameID) != GAME_NOT_STARTED)
+            revert LateJoin();
+        uint16 numBots = GameTable.getNumBots(gameID);
+        BotTable.set(numBots, bot);
+        GameTable.setNumBots(gameID, numBots + 1);
     }
 
     function startGame(uint16 gameID) external {
         if (_msgSender() != GameTable.getCreator(gameID))
             revert CreatorOnly();
 
-        bytes20[] memory bots = (GameTable.getBots(gameID));
-        uint256 length = bots.length;
+        uint256 length = uint256(GameTable.getNumBots(gameID));
         if (length < MIN_BOTS)
             revert NotEnoughBots();
         if (length > MAX_BOTS)
             revert TooManyBots();
 
+        GameTable.setRound(gameID, 0);
         GameTable.setAlive(gameID, uint16(length));
+
         bytes32 seed = blockhash(block.number - 1);
 
         for (uint256 i = 0; i < length; i++) {
-            // initialize positions to be random
-            bytes32[] memory keys;
-            PositionTableData memory position;
+            uint16 x;
+            uint16 y;
+            address other;
             do {
-                uint16 x = uint16(uint256(seed) % MAP_HEIGHT);
+                x = uint16(uint256(seed) % MAP_HEIGHT);
                 seed = keccak256(abi.encodePacked(seed));
-                uint16 y = uint16(uint256(seed) % MAP_WIDTH);
+                y = uint16(uint256(seed) % MAP_WIDTH);
                 seed = keccak256(abi.encodePacked(seed));
-                position = PositionTableData(x, y);
-                keys = getKeysWithValue(positionTableID, PositionTable.encode(position.x, position.y));
-            } while (keys[0] != 0x0); // avoid collisions
-            // TODO switch keys to be addresses
-            PositionTable.set(bytes32(bots[i]), gameID, 0, position);
+                other = ReversePositionTable.get(x, y, gameID, 0);
+            } while (other != address(0));
 
-            // initialize bot data
-            PlayerTable.set(bytes32(bots[i]), gameID, 0,
+            address bot = BotTable.get(i);
+            PositionTable.set(bot, gameID, 0, x, y);
+            AttributeTable.set(bot, gameID, 0,
                 INITIAL_HEALTH, INITIAL_AMMO, INITIAL_ROCKETS, 0 /* lastDash */, CHARGING_TIME);
         }
     }
@@ -67,20 +85,25 @@ contract GameSystem is SystemPlus {
     function nextRound(uint16 gameID) external {
         uint16 round = GameTable.getRound(gameID);
 
+        if (round == MAX_ROUND)
+            revert ItsBeenMuchTooLongIFeelItComingOn();
+
         if (GameTable.getAlive(gameID) <= 1)
             revert GameOver();
 
-        bytes20[] memory bots = (GameTable.getBots(gameID));
-        uint256 length = bots.length;
+        // TODO rename this numbBots
+        uint256 length = uint256(GameTable.getNumBots(gameID));
+        address[] memory bots = new address[](length);
 
-        if (round > 0) {
+        for (uint256 i = 0; i < length; i++) {
+            address bot = BotTable.get(i);
+            bots[i] = bot;
             // Copy over the last round's position & player data.
-            for (uint256 i = 0; i < length; i++) {
-                bytes32 ID = bytes32(bots[i]);
-                PositionTableData memory position = PositionTable.get(ID, gameID, round - 1);
-                PositionTable.set(ID, gameID, round, position);
-                PlayerTableData memory player = PlayerTable.get(ID, gameID, round - 1);
-                PlayerTable.set(ID, gameID, round, player);
+            if (round > 0) {
+                PositionTableData memory position = PositionTable.get(bot, gameID, round - 1);
+                PositionTable.set(bot, gameID, round, position);
+                AttributeTableData memory player = AttributeTable.get(bot, gameID, round - 1);
+                AttributeTable.set(bot, gameID, round, player);
             }
         }
 
@@ -88,38 +111,41 @@ contract GameSystem is SystemPlus {
         // This must happen before applying the effect of actions: all bots take decision based
         // on the previous round's end state.
         for (uint256 i = 0; i < length; i++) {
-            Bot bot = Bot(address(bots[i]));
-            bot.getAction(gameID, round);
+            console.log("react", i);
+            console.log(bots[i]);
+            Bot(bots[i]).react(gameID, round, uint16(i));
         }
 
         IWorld world = world();
         uint256 alive = 0;
 
         for (uint256 i = 0; i < length; i++) {
-            bytes32 ID = bytes32(bots[i]);
-            uint16 health = PlayerTable.getHealth(ID, gameID, round);
+            console.log("enacting", i);
+            address bot = bots[i];
+            uint16 health = AttributeTable.getHealth(bot, gameID, round);
             if (health == 0) continue; // RIP
             alive++;
-            ActionTableData memory action = ActionTable.get(ID, gameID, round);
+            ActionTableData memory action = ActionTable.get(bot, gameID, round);
             ActionType aType = action.actionType;
             if (aType == ActionType.MOVE) {
-                world.move(ID, gameID, round, action.direction);
+                world.move(bot, gameID, round, action.direction);
             } else if (aType == ActionType.DASH) {
-                world.dash(ID, gameID, round, action.direction);
+                world.dash(bot, gameID, round, action.direction);
             } else if (aType == ActionType.SHOOT) {
-                world.shoot(ID, gameID, round, action.targetID);
+                world.shoot(bot, gameID, round, action.target);
             } else if (aType == ActionType.PUNCH) {
-                world.punch(ID, gameID, round, action.targetID);
+                world.punch(bot, gameID, round, action.target);
             } else if (aType == ActionType.BLAST) {
-                world.blast(ID, gameID, round, action.targetID);
+                world.blast(bot, gameID, round, action.target);
             } else if (aType == ActionType.CHARGE) {
-                world.charge(ID, gameID, round);
+                world.charge(bot, gameID, round);
             }
             // if NONE (or not submitted, both 0), do nothing :)
         }
 
         unchecked {
             GameTable.setRound(gameID, round++);
+            GameTable.setAlive(gameID, uint16(alive));
         }
     }
 }

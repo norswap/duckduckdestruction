@@ -8,14 +8,13 @@ import { IStore } from "@latticexyz/store/src/IStore.sol";
 import { IWorldCore } from "@latticexyz/world/src/interfaces/IWorldCore.sol";
 
 import { IActionSystem } from "./IActionSystem.sol";
-import { IAttackSystem } from "./IAttackSystem.sol";
 import { IGameSystem } from "./IGameSystem.sol";
-import { IMoveSystem } from "./IMoveSystem.sol";
+import { ISubmitSystem } from "./ISubmitSystem.sol";
 
 /**
  * The IWorld interface includes all systems dynamically added to the World
  * during the deploy process.
  */
-interface IWorld is IStore, IWorldCore, IActionSystem, IAttackSystem, IGameSystem, IMoveSystem {
+interface IWorld is IStore, IWorldCore, IActionSystem, IGameSystem, ISubmitSystem {
 
 }

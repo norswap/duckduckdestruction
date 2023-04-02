@@ -17,20 +17,21 @@ import { EncodeArray } from "@latticexyz/store/src/tightcoder/EncodeArray.sol";
 import { Schema, SchemaLib } from "@latticexyz/store/src/Schema.sol";
 import { PackedCounter, PackedCounterLib } from "@latticexyz/store/src/PackedCounter.sol";
 
-uint256 constant _tableId = uint256(bytes32(abi.encodePacked(bytes16(""), bytes16("round"))));
-uint256 constant RoundTableId = _tableId;
+uint256 constant _tableId = uint256(bytes32(abi.encodePacked(bytes16(""), bytes16("bot"))));
+uint256 constant BotTableTableId = _tableId;
 
-library Round {
+library BotTable {
   /** Get the table's schema */
   function getSchema() internal pure returns (Schema) {
     SchemaType[] memory _schema = new SchemaType[](1);
-    _schema[0] = SchemaType.UINT16;
+    _schema[0] = SchemaType.ADDRESS;
 
     return SchemaLib.encode(_schema);
   }
 
   function getKeySchema() internal pure returns (Schema) {
-    SchemaType[] memory _schema = new SchemaType[](0);
+    SchemaType[] memory _schema = new SchemaType[](1);
+    _schema[0] = SchemaType.UINT256;
 
     return SchemaLib.encode(_schema);
   }
@@ -38,8 +39,8 @@ library Round {
   /** Get the table's metadata */
   function getMetadata() internal pure returns (string memory, string[] memory) {
     string[] memory _fieldNames = new string[](1);
-    _fieldNames[0] = "round";
-    return ("Round", _fieldNames);
+    _fieldNames[0] = "bot";
+    return ("BotTable", _fieldNames);
   }
 
   /** Register the table's schema */
@@ -64,51 +65,57 @@ library Round {
     _store.setMetadata(_tableId, _tableName, _fieldNames);
   }
 
-  /** Get round */
-  function get() internal view returns (uint16 round) {
-    bytes32[] memory _primaryKeys = new bytes32[](0);
+  /** Get bot */
+  function get(uint256 index) internal view returns (address bot) {
+    bytes32[] memory _primaryKeys = new bytes32[](1);
+    _primaryKeys[0] = bytes32(uint256((index)));
 
     bytes memory _blob = StoreSwitch.getField(_tableId, _primaryKeys, 0);
-    return (uint16(Bytes.slice2(_blob, 0)));
+    return (address(Bytes.slice20(_blob, 0)));
   }
 
-  /** Get round (using the specified store) */
-  function get(IStore _store) internal view returns (uint16 round) {
-    bytes32[] memory _primaryKeys = new bytes32[](0);
+  /** Get bot (using the specified store) */
+  function get(IStore _store, uint256 index) internal view returns (address bot) {
+    bytes32[] memory _primaryKeys = new bytes32[](1);
+    _primaryKeys[0] = bytes32(uint256((index)));
 
     bytes memory _blob = _store.getField(_tableId, _primaryKeys, 0);
-    return (uint16(Bytes.slice2(_blob, 0)));
+    return (address(Bytes.slice20(_blob, 0)));
   }
 
-  /** Set round */
-  function set(uint16 round) internal {
-    bytes32[] memory _primaryKeys = new bytes32[](0);
+  /** Set bot */
+  function set(uint256 index, address bot) internal {
+    bytes32[] memory _primaryKeys = new bytes32[](1);
+    _primaryKeys[0] = bytes32(uint256((index)));
 
-    StoreSwitch.setField(_tableId, _primaryKeys, 0, abi.encodePacked((round)));
+    StoreSwitch.setField(_tableId, _primaryKeys, 0, abi.encodePacked((bot)));
   }
 
-  /** Set round (using the specified store) */
-  function set(IStore _store, uint16 round) internal {
-    bytes32[] memory _primaryKeys = new bytes32[](0);
+  /** Set bot (using the specified store) */
+  function set(IStore _store, uint256 index, address bot) internal {
+    bytes32[] memory _primaryKeys = new bytes32[](1);
+    _primaryKeys[0] = bytes32(uint256((index)));
 
-    _store.setField(_tableId, _primaryKeys, 0, abi.encodePacked((round)));
+    _store.setField(_tableId, _primaryKeys, 0, abi.encodePacked((bot)));
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(uint16 round) internal view returns (bytes memory) {
-    return abi.encodePacked(round);
+  function encode(address bot) internal view returns (bytes memory) {
+    return abi.encodePacked(bot);
   }
 
   /* Delete all data for given keys */
-  function deleteRecord() internal {
-    bytes32[] memory _primaryKeys = new bytes32[](0);
+  function deleteRecord(uint256 index) internal {
+    bytes32[] memory _primaryKeys = new bytes32[](1);
+    _primaryKeys[0] = bytes32(uint256((index)));
 
     StoreSwitch.deleteRecord(_tableId, _primaryKeys);
   }
 
   /* Delete all data for given keys (using the specified store) */
-  function deleteRecord(IStore _store) internal {
-    bytes32[] memory _primaryKeys = new bytes32[](0);
+  function deleteRecord(IStore _store, uint256 index) internal {
+    bytes32[] memory _primaryKeys = new bytes32[](1);
+    _primaryKeys[0] = bytes32(uint256((index)));
 
     _store.deleteRecord(_tableId, _primaryKeys);
   }

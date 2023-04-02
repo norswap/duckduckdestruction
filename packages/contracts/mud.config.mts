@@ -1,12 +1,6 @@
 import { mudConfig, resolveTableId } from "@latticexyz/cli";
 
 export default mudConfig({
-  overrideSystems: {
-    MoveSystem: {
-      fileSelector: "move",
-      openAccess: true,
-    },
-  },
   tables: {
     GlobalTable: {
       primaryKeys: {},
@@ -21,23 +15,23 @@ export default mudConfig({
       schema: {
         creator: "address",
         round: "uint16",
-        alive: "uint16",
-        bots: "bytes20[]"
+        numBots: "uint16",
+        alive: "uint16"
       }
     },
-    RoundTable : {
-      fileSelector: "round",
+    BotTable: {
+      fileSelector: "bot",
       primaryKeys: {
-        game: "uint16",
+        index: "uint256"
       },
       schema: {
-        round: "uint16"
+        bot: "address"
       }
     },
     PositionTable: {
       fileSelector: "position",
       primaryKeys: {
-        player: "bytes32",
+        bot: "address",
         game: "uint16",
         round: "uint16"
       },
@@ -46,10 +40,22 @@ export default mudConfig({
         y: "uint16"
       },
     },
-    PlayerTable: {
-      fileSelector: "player",
+    ReversePositionTable: {
+      fileSelector: "reversePosition",
       primaryKeys: {
-        player: "bytes32",
+        x: "uint16",
+        y: "uint16",
+        game: "uint16",
+        round: "uint16"
+      },
+      schema: {
+        bot: "address"
+      }
+    },
+    AttributeTable: {
+      fileSelector: "attribute",
+      primaryKeys: {
+        bot: "address",
         game: "uint16",
         round: "uint16"
       },
@@ -64,26 +70,19 @@ export default mudConfig({
     ActionTable: {
       fileSelector: "action",
       primaryKeys: {
-        player: "bytes32",
+        bot: "address",
         game: "uint16",
         round: "uint16"
       },
       schema: {
         actionType: "ActionType",
         direction: "Direction",
-        targetID: "bytes32"
+        target: "address"
       }
     }
   },
   enums: {
     Direction: [ "NONE", "LEFT", "RIGHT", "UP", "DOWN" ],
     ActionType: [ "NONE", "MOVE", "DASH", "SHOOT", "BLAST", "PUNCH", "CHARGE" ],
-  },
-  modules: [
-    {
-      name: "KeysWithValueModule",
-      root: true,
-      args: [resolveTableId("PositionTable")],
-    },
-  ],
+  }
 });
