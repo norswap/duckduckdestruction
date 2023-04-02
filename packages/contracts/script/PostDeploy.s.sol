@@ -28,7 +28,7 @@ contract PostDeploy is Script {
     IWorld world = IWorld(worldAddress);
     world.grantAccess("", "reversePosition", hook);
 
-    uint256 length = 6;
+    uint256 length = 8;
     address[] memory bots = new address[](length);
     for (uint256 i = 0; i < length; i++) {
       bots[i] = address(new ExampleBot());

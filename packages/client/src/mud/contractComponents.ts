@@ -25,6 +25,7 @@ export function defineContractComponents(world: World) {
       return defineComponent(
         world,
         {
+          id: RecsType.Number,
           creator: RecsType.String,
           round: RecsType.Number,
           numBots: RecsType.Number,

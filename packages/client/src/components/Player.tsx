@@ -6,19 +6,15 @@ import { AnimationMixer } from 'three';
 import { getComponentValue } from '@latticexyz/recs';
 import { DEG2RAD } from 'three/src/math/MathUtils';
 
-export function Player(props: ThreeElements["mesh"] & { direction: Direction } & { state: string } & { color: string }) {
+export function Player(props: ThreeElements["mesh"] & { direction: Direction } & { attributes: any } & { color: string }) {
   const ref = useRef<THREE.Mesh>(null!);
+  const geometry = loadGeometry("duck.gltf", "NormalDuck_Low_copy");
+  //const rotation = props.direction == Direction.RIGHT ? DEG2RAD * 90 :
+  //  props.direction == Direction.DOWN ? DEG2RAD * 180 :
+  //  props.direction == Direction.LEFT ? DEG2RAD * 270 :
+  //  0;
 
-  const geometry = loadGeometry("duck.gltf", "NormalDuck_Low_copy")
-
-  const map = loadTexture(("8" + ".png"));
-
-  const rotation = props.direction == Direction.RIGHT ? DEG2RAD * 90 :
-    props.direction == Direction.DOWN ? DEG2RAD * 180 :
-    props.direction == Direction.LEFT ? DEG2RAD * 270 :
-    0;
-
-  //const mixer = new AnimationMixer();
+  const rotation = DEG2RAD * 180;
 
   return (
     <mesh
@@ -31,14 +27,14 @@ export function Player(props: ThreeElements["mesh"] & { direction: Direction } &
         0.01
       ]}
       rotation={[
-        Math.PI / 2,
+        (props?.attributes?.health == 0) ? 0 :  Math.PI / 2,
         0,
         rotation
       ]}
       onPointerOver={() => {}}
     >
       <meshStandardMaterial
-        color={props.color}
+        color={(props?.attributes?.health == 0) ? "#666" : props.color}
       />
     </mesh>
   );

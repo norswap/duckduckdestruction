@@ -1,17 +1,18 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import * as THREE from "three";
 import { useRef, useMemo } from "react";
-import { Canvas, useThree, useFrame } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import { useComponentValue, useEntityQuery } from "@latticexyz/react";
 import { useKeyboardMovement } from "../useKeyboardMovement";
-import { EntityID, getComponentValueStrict, Has } from "@latticexyz/recs";
+import { EntityID, getComponentValue, getComponentValueStrict, Has, HasValue, isEntityType } from "@latticexyz/recs";
 import { useMUD } from "../MUDContext";
-import { OrbitControls, Effects } from '@react-three/drei';
+import { OrbitControls, Effects, RoundedBox } from '@react-three/drei';
 import { Player } from './Player';
 import { Action } from './Action';
 import { Tile } from './Tile';
 import { makeSound, loadTexture } from '../utils';
 import { ActionType } from '../types';
+import { hexlify, hexZeroPad } from 'ethers/lib/utils';
 
 // Init soundboard
 const soundBoard = {
@@ -30,62 +31,88 @@ function Scene() {
   const {
     world,
     components: {
+      BotTable,
       PositionTable,
-      ReversePositionTable,
+      //ReversePositionTable,
       AttributeTable,
-      ActionTable 
+      ActionTable,
+      GameTable
     },
     singletonEntity
   } = useMUD();
 
-  //const players = useEntityQuery([Has(PositionTable)])
-  //  .map((entity, i) => {
-  //    const position = getComponentValueStrict(PositionTable, entity);
+  const botAddresses = useEntityQuery([Has(BotTable)])
+    .map(entity => {
+      const address = getComponentValue(BotTable, entity);
+      return address;
+    });
 
-  //    return {
-  //      position,
-  //      attributes: {},
-  //      state: {}
-  //    };
-  //  });
+   const [roundIdx, setRoundIdx] = useState(0);
+   const [gameIdx, setGameIdx] = useState(0);
 
-  //const actions = useEntityQuery([Has(ActionTable)])
-  //  .map((action, i) => {
-  //    //console.log(action);
+    useEffect(() => {
+      //Implementing the setInterval method
+      const interval = setInterval(() => {
+          if (roundIdx < 9) {
+            setRoundIdx(roundIdx + 1);
+          } else {
+            setRoundIdx(0);
 
-  //    //const Action = 0;
+            if (gameIdx < 9) {
+              setGameIdx(gameIdx + 1)
+            } else {
+              setGameIdx(0)
+            }
+          }
 
-  //    //switch (Action) {
-  //    //  case ActionType.PUNCH:
-  //    //  break;
+          console.log(roundIdx)
+          console.log(gameIdx)
+      }, 1500);
 
-  //    //  case ActionType.SHOOT:
-        // teleport
-  //    //  break;
+      //Clearing the interval
+      return () => clearInterval(interval);
+    }, [roundIdx]);
 
-  //    //  case ActionType.CHARGE:
-  //    //  break;
+    const bots = botAddresses
+      .map(({ bot }: any) => {
+        const entity = hexlify(bot).padEnd(66, "0");
+        const game = hexZeroPad(hexlify(0), 32);
+        const round = hexZeroPad(hexlify(roundIdx), 32);
+        const entityID = `${entity}:${game}:${round}`;
 
-  //    //  case ActionType.BLAST:
-  //    //  break;
+        const entityIdx = world.entityToIndex.get(entityID as any);
 
-  //    //  case ActionType.MOVE:
-  //    //  break;
+        const action = getComponentValue(ActionTable, entityIdx as any);
+        const attributes = getComponentValue(AttributeTable, entityIdx as any);
+        const position = getComponentValue(PositionTable, entityIdx as any);
 
-  //    //  case ActionType.DASH:
-  //    //  break;
-  //    //}
-  //  });
+        soundBoard["movement"].play();
 
-  // 🕛
-  //useFrame((state) => {
-  //  const time = state.clock.getElapsedTime();
+        return {
+          entity: bot,
+          action,
+          position,
+          attributes
+        }
+      });
 
-  //  //actions.forEach(action => { });
+  //useEffect(() => {
+  //  const interval = setInterval(() => {
+  //    if (roundIdx == 9) {
+  //      roundIdx = 0;
+  //      updateBots(getBotstate(roundIdx));
+  //    } else {
+  //      setRound(roundIdx++);
+  //    }
+
+  //    console.log(roundIdx);
+  //  }, 2000);
+
+  //  return(() => clearInterval(interval))
   //});
 
   // Preload textures
-  const textures = new Array(8).fill(0).map((_, i) => loadTexture((i == 0 ? 1 : i) + ".png"));
+  const textures = new Array(5).fill(0).map((_, i) => loadTexture((i == 0 ? 1 : i) + ".png"));
 
   const populate = (count: number) => new Array(count).fill(0).map((_, i) => i);
 
@@ -100,7 +127,7 @@ function Scene() {
   const resolution = useMemo(() => new THREE.Vector2(size.width, size.height), [size]);
 
   useEffect(() => {
-    //soundBoard.soundtrack.play();
+    soundBoard.soundtrack.play();
   }, [])
 
   return (
@@ -123,20 +150,16 @@ function Scene() {
             )
           }
         </group>
-
-        {players.map((p, i) => (
+            
+        {bots.map((p: any, i: number) => {
+          return (
           <Player
             key={i}
-            position={[p.position.x, 0, p.position.y]}
-            state={p.state}
+            position={[p?.position.x, 0, p?.position.y]}
             attributes={p.attributes}
-            color={(parseInt(world.entities[p.entity]) * 123456) % 16777215}
-            />
-        ))}
-
-        {actions.map((a, i) => (
-          <Action type={0}/>
-        ))}
+            color={(parseInt(p.entity) * 123456) % 16777215}
+          />)
+        })}
       </group>
     </>
   );
@@ -150,7 +173,6 @@ export const GameBoard = () => {
       <Canvas style={{ height: "100vh" }}>
         {(!FPOV) ? 
         (<OrbitControls
-          autoRotate={true}
           target={[25, -25, 25]}
           keyPanSpeed={0}
           enablePan={true}
@@ -162,6 +184,6 @@ export const GameBoard = () => {
         }
         <Scene/>
      </Canvas>
-    </>
+   </>
   );
 };
