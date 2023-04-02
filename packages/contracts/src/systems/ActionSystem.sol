@@ -18,9 +18,9 @@ import "../Globals.sol";
 
 contract ActionSystem is SystemPlus {
 
-    function encoded(AttributeTableData memory player) internal pure returns (bytes32 result) {
+    function encoded(AttributeTableData memory attributes) internal pure returns (bytes32 result) {
         assembly {
-            result := mload(player)
+            result := mload(attributes)
         }
     }
 
@@ -33,29 +33,29 @@ contract ActionSystem is SystemPlus {
 
     function punch(address bot, uint16 gameID, uint16 round, address target) public {
         AttributeTableData memory original = AttributeTable.get(bot, gameID, round);
-        AttributeTableData memory player = original;
-        if (hits(bot, gameID, round, target, 1)) player.health -= PUNCH_DAMAGE;
-        if (player.charge != CHARGING_TIME) player.charge += DISCHARGE_SPEED;
-        if (encoded(player) != encoded(original)) AttributeTable.set(bot, gameID, round, player);
+        AttributeTableData memory attributes = original;
+        if (hits(bot, gameID, round, target, 1)) attributes.health -= PUNCH_DAMAGE;
+        if (attributes.charge != CHARGING_TIME) attributes.charge += DISCHARGE_SPEED;
+        if (encoded(attributes) != encoded(original)) AttributeTable.set(bot, gameID, round, attributes);
     }
 
     function shoot(address bot, uint16 gameID, uint16 round, address target) public {
-        AttributeTableData memory player = AttributeTable.get(bot, gameID, round);
-        if (player.ammo == 0) return; // out of ammo
-        player.ammo--;
-        if (hits(bot, gameID, round, target, SHOOT_RADIUS)) player.health -= SHOOT_DAMAGE;
-        if (player.charge != CHARGING_TIME) player.charge += DISCHARGE_SPEED;
-        AttributeTable.set(bot, gameID, round, player);
+        AttributeTableData memory attributes = AttributeTable.get(bot, gameID, round);
+        if (attributes.ammo == 0) return; // out of ammo
+        attributes.ammo--;
+        if (hits(bot, gameID, round, target, SHOOT_RADIUS)) attributes.health -= SHOOT_DAMAGE;
+        if (attributes.charge != CHARGING_TIME) attributes.charge += DISCHARGE_SPEED;
+        AttributeTable.set(bot, gameID, round, attributes);
     }
 
     function blast(address bot, uint16 gameID, uint16 round, address target) public {
-        AttributeTableData memory player = AttributeTable.get(bot, gameID, round);
-        if (player.charge != 0) return; // not charged
-        if (player.rockets == 0) return; // out of rockets
-        player.rockets--;
-        player.charge = CHARGING_TIME;
-        if (hits(bot, gameID, round, target, BLAST_RADIUS)) player.health -= BLAST_DAMAGE;
-        AttributeTable.set(bot, gameID, round, player);
+        AttributeTableData memory attributes = AttributeTable.get(bot, gameID, round);
+        if (attributes.charge != 0) return; // not charged
+        if (attributes.rockets == 0) return; // out of rockets
+        attributes.rockets--;
+        attributes.charge = CHARGING_TIME;
+        if (hits(bot, gameID, round, target, BLAST_RADIUS)) attributes.health -= BLAST_DAMAGE;
+        AttributeTable.set(bot, gameID, round, attributes);
     }
 
     function charge(address bot, uint16 gameID, uint16 round) public {
@@ -84,8 +84,8 @@ contract ActionSystem is SystemPlus {
     }
 
     function dash(address bot, uint16 gameID, uint16 round, Direction direction) public {
-        AttributeTableData memory player = AttributeTable.get(bot, gameID, round);
-        uint16 last = player.lastDash;
+        AttributeTableData memory attributes = AttributeTable.get(bot, gameID, round);
+        uint16 last = attributes.lastDash;
         if (last + DASH_COOLDOWN > round && last != 0) return; // still on cooldown
 
         PositionTableData memory position = PositionTable.get(bot, gameID, round);
@@ -101,8 +101,8 @@ contract ActionSystem is SystemPlus {
             }
         }
         PositionTable.set(bot, gameID, round, position);
-        player.lastDash = round;
-        if (player.charge != CHARGING_TIME) player.charge += DISCHARGE_SPEED;
-        AttributeTable.set(bot, gameID, round, player);
+        attributes.lastDash = round;
+        if (attributes.charge != CHARGING_TIME) attributes.charge += DISCHARGE_SPEED;
+        AttributeTable.set(bot, gameID, round, attributes);
     }
 }

@@ -50,7 +50,7 @@ contract GameSystem is SystemPlus {
         if (GameTable.getRound(gameID) != GAME_NOT_STARTED)
             revert LateJoin();
         uint16 numBots = GameTable.getNumBots(gameID);
-        BotTable.set(numBots, bot);
+        BotTable.set(numBots, bot); // TODO should be indexed on the gameID
         GameTable.setNumBots(gameID, numBots + 1);
     }
 
@@ -97,26 +97,25 @@ contract GameSystem is SystemPlus {
         if (GameTable.getAlive(gameID) <= 1)
             revert GameOver();
 
-        // TODO rename this numbBots
-        uint256 length = uint256(GameTable.getNumBots(gameID));
-        address[] memory bots = new address[](length);
+        uint256 numBots = uint256(GameTable.getNumBots(gameID));
+        address[] memory bots = new address[](numBots);
 
-        for (uint256 i = 0; i < length; i++) {
+        for (uint256 i = 0; i < numBots; i++) {
             address bot = BotTable.get(i);
             bots[i] = bot;
-            // Copy over the last round's position & player data.
+            // Copy over the last round's position & attributes.
             if (round > 0) {
                 PositionTableData memory position = PositionTable.get(bot, gameID, round - 1);
                 PositionTable.set(bot, gameID, round, position);
-                AttributeTableData memory player = AttributeTable.get(bot, gameID, round - 1);
-                AttributeTable.set(bot, gameID, round, player);
+                AttributeTableData memory attributes = AttributeTable.get(bot, gameID, round - 1);
+                AttributeTable.set(bot, gameID, round, attributes);
             }
         }
 
         // Populate the bots' action table for this round.
         // This must happen before applying the effect of actions: all bots take decision based
         // on the previous round's end state.
-        for (uint256 i = 0; i < length; i++) {
+        for (uint256 i = 0; i < numBots; i++) {
             console2.log("reacting", bots[i], round, i);
             Bot(bots[i]).react(gameID, round, uint16(i));
         }
@@ -124,7 +123,7 @@ contract GameSystem is SystemPlus {
         IWorld world = world();
         uint256 alive = 0;
 
-        for (uint256 i = 0; i < length; i++) {
+        for (uint256 i = 0; i < numBots; i++) {
             console2.log("enacting", round, i);
             address bot = bots[i];
             uint16 health = AttributeTable.getHealth(bot, gameID, round);
@@ -135,10 +134,10 @@ contract GameSystem is SystemPlus {
             if (aType == ActionType.MOVE) {
                 console2.log("before move");
                 world.move(bot, gameID, round, action.direction);
-                console2.log("after move");
             } else if (aType == ActionType.DASH) {
                 world.dash(bot, gameID, round, action.direction);
             } else if (aType == ActionType.SHOOT) {
+                console2.log("before shoot");
                 world.shoot(bot, gameID, round, action.target);
             } else if (aType == ActionType.PUNCH) {
                 world.punch(bot, gameID, round, action.target);
