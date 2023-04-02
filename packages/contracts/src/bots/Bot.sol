@@ -20,7 +20,6 @@ abstract contract Bot {
 
     // Returns the sender cast with its World interface.
     function world() internal view returns (IWorld) {
-        console.log("world", msg.sender);
         return IWorld(msg.sender);
     }
 
@@ -33,4 +32,7 @@ abstract contract Bot {
     }
 
     function react(uint16 gameID, uint16 round, uint16 index) external virtual;
+
+    // TODO: Bots an currently see previous bots' action and the whole map.
+    //
 }

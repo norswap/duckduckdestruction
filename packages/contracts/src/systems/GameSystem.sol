@@ -28,12 +28,10 @@ uint16 constant GAME_NOT_STARTED = type(uint16).max;
 contract GameSystem is SystemPlus {
 
     function createGame() external returns(uint16 gameID) {
-        console.log("createGame", _msgSender());
         gameID = GlobalTable.get();
         GlobalTable.set(gameID + 1);
         GameTable.setCreator(gameID, _msgSender());
         GameTable.setRound(gameID, GAME_NOT_STARTED);
-        console.log("gameID", gameID);
     }
 
     function addBot(uint16 gameID, address bot) external {
@@ -110,8 +108,7 @@ contract GameSystem is SystemPlus {
         // This must happen before applying the effect of actions: all bots take decision based
         // on the previous round's end state.
         for (uint256 i = 0; i < length; i++) {
-            console2.log("reacting", round, i);
-            console.log(bots[i]);
+            console2.log("reacting", bots[i], round, i);
             Bot(bots[i]).react(gameID, round, uint16(i));
         }
 
@@ -127,7 +124,9 @@ contract GameSystem is SystemPlus {
             ActionTableData memory action = ActionTable.get(bot, gameID, round);
             ActionType aType = action.actionType;
             if (aType == ActionType.MOVE) {
+                console2.log("before move");
                 world.move(bot, gameID, round, action.direction);
+                console2.log("after move");
             } else if (aType == ActionType.DASH) {
                 world.dash(bot, gameID, round, action.direction);
             } else if (aType == ActionType.SHOOT) {

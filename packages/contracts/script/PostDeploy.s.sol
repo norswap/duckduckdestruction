@@ -32,9 +32,6 @@ contract PostDeploy is Script {
     address[] memory bots = new address[](length);
     for (uint256 i = 0; i < length; i++) {
       bots[i] = address(new ExampleBot());
-      // TODO does not solve the problem
-//      world.grantAccess("", bots[i]);
-//      world.grantAccess("", "SubmitSystem", bots[i]);
       console.log("ExampleBot address", bots[i]);
     }
 
