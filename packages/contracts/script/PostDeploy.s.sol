@@ -35,6 +35,16 @@ contract PostDeploy is Script {
       console.log("ExampleBot address", bots[i]);
     }
 
+    uint256 rounds = 10;
+    uint16 gameID = world.createGame();
+    for (uint256 i = 0; i < length; i++) {
+      world.addBot(gameID, bots[i]);
+    }
+    world.startGame(gameID);
+    for (uint256 i = 0; i < rounds; i++) {
+      world.nextRound(gameID);
+    }
+
     vm.stopBroadcast();
   }
 }

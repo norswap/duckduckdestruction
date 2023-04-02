@@ -30,23 +30,23 @@ import type {
 export type ActionTableDataStruct = {
   actionType: PromiseOrValue<BigNumberish>;
   direction: PromiseOrValue<BigNumberish>;
-  targetID: PromiseOrValue<BytesLike>;
+  target: PromiseOrValue<string>;
 };
 
 export type ActionTableDataStructOutput = [number, number, string] & {
   actionType: number;
   direction: number;
-  targetID: string;
+  target: string;
 };
 
 export interface IWorldInterface extends utils.Interface {
   functions: {
     "addBot(uint16,address)": FunctionFragment;
-    "blast(bytes32,uint16,uint16,bytes32)": FunctionFragment;
+    "blast(address,uint16,uint16,address)": FunctionFragment;
     "call(bytes16,bytes16,bytes)": FunctionFragment;
-    "charge(bytes32,uint16,uint16)": FunctionFragment;
+    "charge(address,uint16,uint16)": FunctionFragment;
     "createGame()": FunctionFragment;
-    "dash(bytes32,uint16,uint16,uint8)": FunctionFragment;
+    "dash(address,uint16,uint16,uint8)": FunctionFragment;
     "deleteRecord(uint256,bytes32[])": FunctionFragment;
     "deleteRecord(bytes16,bytes16,bytes32[])": FunctionFragment;
     "getField(uint256,bytes32[],uint8)": FunctionFragment;
@@ -59,9 +59,9 @@ export interface IWorldInterface extends utils.Interface {
     "installModule(address,bytes)": FunctionFragment;
     "installRootModule(address,bytes)": FunctionFragment;
     "isStore()": FunctionFragment;
-    "move(bytes32,uint16,uint16,uint8)": FunctionFragment;
+    "move(address,uint16,uint16,uint8)": FunctionFragment;
     "nextRound(uint16)": FunctionFragment;
-    "punch(bytes32,uint16,uint16,bytes32)": FunctionFragment;
+    "punch(address,uint16,uint16,address)": FunctionFragment;
     "pushToField(uint256,bytes32[],uint8,bytes)": FunctionFragment;
     "pushToField(bytes16,bytes16,bytes32[],uint8,bytes)": FunctionFragment;
     "registerSchema(uint256,bytes32,bytes32)": FunctionFragment;
@@ -72,9 +72,10 @@ export interface IWorldInterface extends utils.Interface {
     "setMetadata(uint256,string,string[])": FunctionFragment;
     "setRecord(bytes16,bytes16,bytes32[],bytes)": FunctionFragment;
     "setRecord(uint256,bytes32[],bytes)": FunctionFragment;
-    "shoot(bytes32,uint16,uint16,bytes32)": FunctionFragment;
+    "shoot(address,uint16,uint16,address)": FunctionFragment;
     "startGame(uint16)": FunctionFragment;
-    "submitAction(uint16,(uint8,uint8,bytes32))": FunctionFragment;
+    "submitAction(uint16,uint16,(uint8,uint8,address))": FunctionFragment;
+    "tmpDeployBots(uint16)": FunctionFragment;
   };
 
   getFunction(
@@ -113,6 +114,7 @@ export interface IWorldInterface extends utils.Interface {
       | "shoot"
       | "startGame"
       | "submitAction"
+      | "tmpDeployBots"
   ): FunctionFragment;
 
   encodeFunctionData(
@@ -122,10 +124,10 @@ export interface IWorldInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "blast",
     values: [
-      PromiseOrValue<BytesLike>,
+      PromiseOrValue<string>,
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>
+      PromiseOrValue<string>
     ]
   ): string;
   encodeFunctionData(
@@ -139,7 +141,7 @@ export interface IWorldInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "charge",
     values: [
-      PromiseOrValue<BytesLike>,
+      PromiseOrValue<string>,
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>
     ]
@@ -151,7 +153,7 @@ export interface IWorldInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "dash",
     values: [
-      PromiseOrValue<BytesLike>,
+      PromiseOrValue<string>,
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>
@@ -221,7 +223,7 @@ export interface IWorldInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "move",
     values: [
-      PromiseOrValue<BytesLike>,
+      PromiseOrValue<string>,
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>
@@ -234,10 +236,10 @@ export interface IWorldInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "punch",
     values: [
-      PromiseOrValue<BytesLike>,
+      PromiseOrValue<string>,
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>
+      PromiseOrValue<string>
     ]
   ): string;
   encodeFunctionData(
@@ -326,10 +328,10 @@ export interface IWorldInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "shoot",
     values: [
-      PromiseOrValue<BytesLike>,
+      PromiseOrValue<string>,
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>
+      PromiseOrValue<string>
     ]
   ): string;
   encodeFunctionData(
@@ -338,7 +340,15 @@ export interface IWorldInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "submitAction",
-    values: [PromiseOrValue<BigNumberish>, ActionTableDataStruct]
+    values: [
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>,
+      ActionTableDataStruct
+    ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "tmpDeployBots",
+    values: [PromiseOrValue<BigNumberish>]
   ): string;
 
   decodeFunctionResult(functionFragment: "addBot", data: BytesLike): Result;
@@ -435,6 +445,10 @@ export interface IWorldInterface extends utils.Interface {
     functionFragment: "submitAction",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "tmpDeployBots",
+    data: BytesLike
+  ): Result;
 
   events: {
     "StoreDeleteRecord(uint256,bytes32[])": EventFragment;
@@ -518,10 +532,10 @@ export interface IWorld extends BaseContract {
     ): Promise<ContractTransaction>;
 
     blast(
-      ID: PromiseOrValue<BytesLike>,
+      bot: PromiseOrValue<string>,
       gameID: PromiseOrValue<BigNumberish>,
       round: PromiseOrValue<BigNumberish>,
-      targetID: PromiseOrValue<BytesLike>,
+      target: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -533,7 +547,7 @@ export interface IWorld extends BaseContract {
     ): Promise<ContractTransaction>;
 
     charge(
-      ID: PromiseOrValue<BytesLike>,
+      bot: PromiseOrValue<string>,
       gameID: PromiseOrValue<BigNumberish>,
       round: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -544,7 +558,7 @@ export interface IWorld extends BaseContract {
     ): Promise<ContractTransaction>;
 
     dash(
-      ID: PromiseOrValue<BytesLike>,
+      bot: PromiseOrValue<string>,
       gameID: PromiseOrValue<BigNumberish>,
       round: PromiseOrValue<BigNumberish>,
       direction: PromiseOrValue<BigNumberish>,
@@ -622,7 +636,7 @@ export interface IWorld extends BaseContract {
     isStore(overrides?: CallOverrides): Promise<[void]>;
 
     move(
-      ID: PromiseOrValue<BytesLike>,
+      bot: PromiseOrValue<string>,
       gameID: PromiseOrValue<BigNumberish>,
       round: PromiseOrValue<BigNumberish>,
       direction: PromiseOrValue<BigNumberish>,
@@ -635,10 +649,10 @@ export interface IWorld extends BaseContract {
     ): Promise<ContractTransaction>;
 
     punch(
-      ID: PromiseOrValue<BytesLike>,
+      bot: PromiseOrValue<string>,
       gameID: PromiseOrValue<BigNumberish>,
       round: PromiseOrValue<BigNumberish>,
-      targetID: PromiseOrValue<BytesLike>,
+      target: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -719,10 +733,10 @@ export interface IWorld extends BaseContract {
     ): Promise<ContractTransaction>;
 
     shoot(
-      ID: PromiseOrValue<BytesLike>,
+      bot: PromiseOrValue<string>,
       gameID: PromiseOrValue<BigNumberish>,
       round: PromiseOrValue<BigNumberish>,
-      targetID: PromiseOrValue<BytesLike>,
+      target: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -733,7 +747,13 @@ export interface IWorld extends BaseContract {
 
     submitAction(
       gameID: PromiseOrValue<BigNumberish>,
+      index: PromiseOrValue<BigNumberish>,
       action: ActionTableDataStruct,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    tmpDeployBots(
+      gameID: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
   };
@@ -745,10 +765,10 @@ export interface IWorld extends BaseContract {
   ): Promise<ContractTransaction>;
 
   blast(
-    ID: PromiseOrValue<BytesLike>,
+    bot: PromiseOrValue<string>,
     gameID: PromiseOrValue<BigNumberish>,
     round: PromiseOrValue<BigNumberish>,
-    targetID: PromiseOrValue<BytesLike>,
+    target: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -760,7 +780,7 @@ export interface IWorld extends BaseContract {
   ): Promise<ContractTransaction>;
 
   charge(
-    ID: PromiseOrValue<BytesLike>,
+    bot: PromiseOrValue<string>,
     gameID: PromiseOrValue<BigNumberish>,
     round: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -771,7 +791,7 @@ export interface IWorld extends BaseContract {
   ): Promise<ContractTransaction>;
 
   dash(
-    ID: PromiseOrValue<BytesLike>,
+    bot: PromiseOrValue<string>,
     gameID: PromiseOrValue<BigNumberish>,
     round: PromiseOrValue<BigNumberish>,
     direction: PromiseOrValue<BigNumberish>,
@@ -849,7 +869,7 @@ export interface IWorld extends BaseContract {
   isStore(overrides?: CallOverrides): Promise<void>;
 
   move(
-    ID: PromiseOrValue<BytesLike>,
+    bot: PromiseOrValue<string>,
     gameID: PromiseOrValue<BigNumberish>,
     round: PromiseOrValue<BigNumberish>,
     direction: PromiseOrValue<BigNumberish>,
@@ -862,10 +882,10 @@ export interface IWorld extends BaseContract {
   ): Promise<ContractTransaction>;
 
   punch(
-    ID: PromiseOrValue<BytesLike>,
+    bot: PromiseOrValue<string>,
     gameID: PromiseOrValue<BigNumberish>,
     round: PromiseOrValue<BigNumberish>,
-    targetID: PromiseOrValue<BytesLike>,
+    target: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -946,10 +966,10 @@ export interface IWorld extends BaseContract {
   ): Promise<ContractTransaction>;
 
   shoot(
-    ID: PromiseOrValue<BytesLike>,
+    bot: PromiseOrValue<string>,
     gameID: PromiseOrValue<BigNumberish>,
     round: PromiseOrValue<BigNumberish>,
-    targetID: PromiseOrValue<BytesLike>,
+    target: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -960,7 +980,13 @@ export interface IWorld extends BaseContract {
 
   submitAction(
     gameID: PromiseOrValue<BigNumberish>,
+    index: PromiseOrValue<BigNumberish>,
     action: ActionTableDataStruct,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  tmpDeployBots(
+    gameID: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -972,10 +998,10 @@ export interface IWorld extends BaseContract {
     ): Promise<void>;
 
     blast(
-      ID: PromiseOrValue<BytesLike>,
+      bot: PromiseOrValue<string>,
       gameID: PromiseOrValue<BigNumberish>,
       round: PromiseOrValue<BigNumberish>,
-      targetID: PromiseOrValue<BytesLike>,
+      target: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -987,7 +1013,7 @@ export interface IWorld extends BaseContract {
     ): Promise<string>;
 
     charge(
-      ID: PromiseOrValue<BytesLike>,
+      bot: PromiseOrValue<string>,
       gameID: PromiseOrValue<BigNumberish>,
       round: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -996,7 +1022,7 @@ export interface IWorld extends BaseContract {
     createGame(overrides?: CallOverrides): Promise<number>;
 
     dash(
-      ID: PromiseOrValue<BytesLike>,
+      bot: PromiseOrValue<string>,
       gameID: PromiseOrValue<BigNumberish>,
       round: PromiseOrValue<BigNumberish>,
       direction: PromiseOrValue<BigNumberish>,
@@ -1074,7 +1100,7 @@ export interface IWorld extends BaseContract {
     isStore(overrides?: CallOverrides): Promise<void>;
 
     move(
-      ID: PromiseOrValue<BytesLike>,
+      bot: PromiseOrValue<string>,
       gameID: PromiseOrValue<BigNumberish>,
       round: PromiseOrValue<BigNumberish>,
       direction: PromiseOrValue<BigNumberish>,
@@ -1087,10 +1113,10 @@ export interface IWorld extends BaseContract {
     ): Promise<void>;
 
     punch(
-      ID: PromiseOrValue<BytesLike>,
+      bot: PromiseOrValue<string>,
       gameID: PromiseOrValue<BigNumberish>,
       round: PromiseOrValue<BigNumberish>,
-      targetID: PromiseOrValue<BytesLike>,
+      target: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1171,10 +1197,10 @@ export interface IWorld extends BaseContract {
     ): Promise<void>;
 
     shoot(
-      ID: PromiseOrValue<BytesLike>,
+      bot: PromiseOrValue<string>,
       gameID: PromiseOrValue<BigNumberish>,
       round: PromiseOrValue<BigNumberish>,
-      targetID: PromiseOrValue<BytesLike>,
+      target: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1185,7 +1211,13 @@ export interface IWorld extends BaseContract {
 
     submitAction(
       gameID: PromiseOrValue<BigNumberish>,
+      index: PromiseOrValue<BigNumberish>,
       action: ActionTableDataStruct,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    tmpDeployBots(
+      gameID: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
   };
@@ -1230,10 +1262,10 @@ export interface IWorld extends BaseContract {
     ): Promise<BigNumber>;
 
     blast(
-      ID: PromiseOrValue<BytesLike>,
+      bot: PromiseOrValue<string>,
       gameID: PromiseOrValue<BigNumberish>,
       round: PromiseOrValue<BigNumberish>,
-      targetID: PromiseOrValue<BytesLike>,
+      target: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1245,7 +1277,7 @@ export interface IWorld extends BaseContract {
     ): Promise<BigNumber>;
 
     charge(
-      ID: PromiseOrValue<BytesLike>,
+      bot: PromiseOrValue<string>,
       gameID: PromiseOrValue<BigNumberish>,
       round: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -1256,7 +1288,7 @@ export interface IWorld extends BaseContract {
     ): Promise<BigNumber>;
 
     dash(
-      ID: PromiseOrValue<BytesLike>,
+      bot: PromiseOrValue<string>,
       gameID: PromiseOrValue<BigNumberish>,
       round: PromiseOrValue<BigNumberish>,
       direction: PromiseOrValue<BigNumberish>,
@@ -1334,7 +1366,7 @@ export interface IWorld extends BaseContract {
     isStore(overrides?: CallOverrides): Promise<BigNumber>;
 
     move(
-      ID: PromiseOrValue<BytesLike>,
+      bot: PromiseOrValue<string>,
       gameID: PromiseOrValue<BigNumberish>,
       round: PromiseOrValue<BigNumberish>,
       direction: PromiseOrValue<BigNumberish>,
@@ -1347,10 +1379,10 @@ export interface IWorld extends BaseContract {
     ): Promise<BigNumber>;
 
     punch(
-      ID: PromiseOrValue<BytesLike>,
+      bot: PromiseOrValue<string>,
       gameID: PromiseOrValue<BigNumberish>,
       round: PromiseOrValue<BigNumberish>,
-      targetID: PromiseOrValue<BytesLike>,
+      target: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1431,10 +1463,10 @@ export interface IWorld extends BaseContract {
     ): Promise<BigNumber>;
 
     shoot(
-      ID: PromiseOrValue<BytesLike>,
+      bot: PromiseOrValue<string>,
       gameID: PromiseOrValue<BigNumberish>,
       round: PromiseOrValue<BigNumberish>,
-      targetID: PromiseOrValue<BytesLike>,
+      target: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1445,7 +1477,13 @@ export interface IWorld extends BaseContract {
 
     submitAction(
       gameID: PromiseOrValue<BigNumberish>,
+      index: PromiseOrValue<BigNumberish>,
       action: ActionTableDataStruct,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    tmpDeployBots(
+      gameID: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
   };
@@ -1458,10 +1496,10 @@ export interface IWorld extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     blast(
-      ID: PromiseOrValue<BytesLike>,
+      bot: PromiseOrValue<string>,
       gameID: PromiseOrValue<BigNumberish>,
       round: PromiseOrValue<BigNumberish>,
-      targetID: PromiseOrValue<BytesLike>,
+      target: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1473,7 +1511,7 @@ export interface IWorld extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     charge(
-      ID: PromiseOrValue<BytesLike>,
+      bot: PromiseOrValue<string>,
       gameID: PromiseOrValue<BigNumberish>,
       round: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -1484,7 +1522,7 @@ export interface IWorld extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     dash(
-      ID: PromiseOrValue<BytesLike>,
+      bot: PromiseOrValue<string>,
       gameID: PromiseOrValue<BigNumberish>,
       round: PromiseOrValue<BigNumberish>,
       direction: PromiseOrValue<BigNumberish>,
@@ -1562,7 +1600,7 @@ export interface IWorld extends BaseContract {
     isStore(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     move(
-      ID: PromiseOrValue<BytesLike>,
+      bot: PromiseOrValue<string>,
       gameID: PromiseOrValue<BigNumberish>,
       round: PromiseOrValue<BigNumberish>,
       direction: PromiseOrValue<BigNumberish>,
@@ -1575,10 +1613,10 @@ export interface IWorld extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     punch(
-      ID: PromiseOrValue<BytesLike>,
+      bot: PromiseOrValue<string>,
       gameID: PromiseOrValue<BigNumberish>,
       round: PromiseOrValue<BigNumberish>,
-      targetID: PromiseOrValue<BytesLike>,
+      target: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1659,10 +1697,10 @@ export interface IWorld extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     shoot(
-      ID: PromiseOrValue<BytesLike>,
+      bot: PromiseOrValue<string>,
       gameID: PromiseOrValue<BigNumberish>,
       round: PromiseOrValue<BigNumberish>,
-      targetID: PromiseOrValue<BytesLike>,
+      target: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1673,7 +1711,13 @@ export interface IWorld extends BaseContract {
 
     submitAction(
       gameID: PromiseOrValue<BigNumberish>,
+      index: PromiseOrValue<BigNumberish>,
       action: ActionTableDataStruct,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    tmpDeployBots(
+      gameID: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
   };

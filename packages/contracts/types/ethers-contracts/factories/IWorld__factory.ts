@@ -103,9 +103,9 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "bytes32",
-        name: "ID",
-        type: "bytes32",
+        internalType: "address",
+        name: "bot",
+        type: "address",
       },
       {
         internalType: "uint16",
@@ -118,9 +118,9 @@ const _abi = [
         type: "uint16",
       },
       {
-        internalType: "bytes32",
-        name: "targetID",
-        type: "bytes32",
+        internalType: "address",
+        name: "target",
+        type: "address",
       },
     ],
     name: "blast",
@@ -160,9 +160,9 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "bytes32",
-        name: "ID",
-        type: "bytes32",
+        internalType: "address",
+        name: "bot",
+        type: "address",
       },
       {
         internalType: "uint16",
@@ -196,9 +196,9 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "bytes32",
-        name: "ID",
-        type: "bytes32",
+        internalType: "address",
+        name: "bot",
+        type: "address",
       },
       {
         internalType: "uint16",
@@ -469,9 +469,9 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "bytes32",
-        name: "ID",
-        type: "bytes32",
+        internalType: "address",
+        name: "bot",
+        type: "address",
       },
       {
         internalType: "uint16",
@@ -510,9 +510,9 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "bytes32",
-        name: "ID",
-        type: "bytes32",
+        internalType: "address",
+        name: "bot",
+        type: "address",
       },
       {
         internalType: "uint16",
@@ -525,9 +525,9 @@ const _abi = [
         type: "uint16",
       },
       {
-        internalType: "bytes32",
-        name: "targetID",
-        type: "bytes32",
+        internalType: "address",
+        name: "target",
+        type: "address",
       },
     ],
     name: "punch",
@@ -798,9 +798,9 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "bytes32",
-        name: "ID",
-        type: "bytes32",
+        internalType: "address",
+        name: "bot",
+        type: "address",
       },
       {
         internalType: "uint16",
@@ -813,9 +813,9 @@ const _abi = [
         type: "uint16",
       },
       {
-        internalType: "bytes32",
-        name: "targetID",
-        type: "bytes32",
+        internalType: "address",
+        name: "target",
+        type: "address",
       },
     ],
     name: "shoot",
@@ -844,6 +844,11 @@ const _abi = [
         type: "uint16",
       },
       {
+        internalType: "uint16",
+        name: "index",
+        type: "uint16",
+      },
+      {
         components: [
           {
             internalType: "enum ActionType",
@@ -856,9 +861,9 @@ const _abi = [
             type: "uint8",
           },
           {
-            internalType: "bytes32",
-            name: "targetID",
-            type: "bytes32",
+            internalType: "address",
+            name: "target",
+            type: "address",
           },
         ],
         internalType: "struct ActionTableData",
@@ -867,6 +872,19 @@ const _abi = [
       },
     ],
     name: "submitAction",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint16",
+        name: "gameID",
+        type: "uint16",
+      },
+    ],
+    name: "tmpDeployBots",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
