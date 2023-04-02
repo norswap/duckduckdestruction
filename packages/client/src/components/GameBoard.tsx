@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import * as THREE from "three";
-import { useRef, useMemo } from "react";
+import { useRef, useMemo } from "react"
 import { Canvas, useThree } from "@react-three/fiber";
 import { useComponentValue, useEntityQuery } from "@latticexyz/react";
 import { useKeyboardMovement } from "../useKeyboardMovement";
@@ -19,7 +19,9 @@ const soundBoard = {
   soundtrack: makeSound("soundtrack", {
     loop: true
   }),
-  movement: makeSound("movement"),
+  movement: makeSound("movement", {
+    volume: 0.75
+  }),
   hit: makeSound("hit"),
   death: makeSound("death")
 };
@@ -86,7 +88,7 @@ function Scene() {
         const attributes = getComponentValue(AttributeTable, entityIdx as any);
         const position = getComponentValue(PositionTable, entityIdx as any);
 
-        soundBoard["movement"].play();
+        //soundBoard["movement"].play();
 
         return {
           entity: bot,
