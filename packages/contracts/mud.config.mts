@@ -1,6 +1,13 @@
 import { mudConfig, resolveTableId } from "@latticexyz/cli";
 
 export default mudConfig({
+  overrideSystems: {
+    ActionSystem: {
+      fileSelector: "ActionSystem",
+      openAccess: true, // TODO should be false
+      // accessList: ["GameSystem"]
+    },
+  },
   tables: {
     GlobalTable: {
       primaryKeys: {},
