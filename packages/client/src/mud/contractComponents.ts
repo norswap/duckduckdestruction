@@ -27,8 +27,8 @@ export function defineContractComponents(world: World) {
         {
           creator: RecsType.String,
           round: RecsType.Number,
+          numBots: RecsType.Number,
           alive: RecsType.Number,
-          bots: RecsType.StringArray,
         },
         {
           metadata: {
@@ -38,12 +38,12 @@ export function defineContractComponents(world: World) {
         }
       );
     })(),
-    RoundTable: (() => {
-      const tableId = new TableId("", "round");
+    BotTable: (() => {
+      const tableId = new TableId("", "bot");
       return defineComponent(
         world,
         {
-          round: RecsType.Number,
+          bot: RecsType.String,
         },
         {
           metadata: {
@@ -69,8 +69,23 @@ export function defineContractComponents(world: World) {
         }
       );
     })(),
-    PlayerTable: (() => {
-      const tableId = new TableId("", "player");
+    ReversePositionTable: (() => {
+      const tableId = new TableId("", "reversePosition");
+      return defineComponent(
+        world,
+        {
+          bot: RecsType.String,
+        },
+        {
+          metadata: {
+            contractId: tableId.toHexString(),
+            tableId: tableId.toString(),
+          },
+        }
+      );
+    })(),
+    AttributeTable: (() => {
+      const tableId = new TableId("", "attribute");
       return defineComponent(
         world,
         {
@@ -95,7 +110,7 @@ export function defineContractComponents(world: World) {
         {
           actionType: RecsType.Number,
           direction: RecsType.Number,
-          targetID: RecsType.String,
+          target: RecsType.String,
         },
         {
           metadata: {

@@ -15,4 +15,8 @@ export enum ActionType {
     "PUNCH",
     "CHARGE"
 }
- 
+
+export enum GameState {
+    "NOT_STARTED",
+    "STARTED"
+}

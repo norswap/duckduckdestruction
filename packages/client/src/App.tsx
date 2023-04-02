@@ -1,22 +1,20 @@
 import { GameBoard } from "./components/GameBoard";
-import { useMUD } from './MUDContext';
-import { useComponentValue } from '@latticexyz/react';
-import { SyncState } from '@latticexyz/network';
+import { useMUD } from "./MUDContext";
+import { Has } from "@latticexyz/recs";
+import { useEntityQuery, useComponentValue } from "@latticexyz/react";
+import { SyncState } from "@latticexyz/network";
 import "./index.css";
-import { Intro } from './components/Intro';
-import { useState } from 'react';
+import { useEffect, useState } from "react";
+import { GameState } from "./types"
 
 export const App = () => {
   const {
     world,
-    components: { LoadingState },
+    components: { LoadingState, GlobalTable, GameTable },
     network: { connectedAddress },
     singletonEntity,
     worldSend
   } = useMUD();
-
-  let gameID = 1; 
-  let [started, setStarted] = useState(false);
 
   const loadingState = useComponentValue(LoadingState, singletonEntity, {
     state: SyncState.CONNECTING,
@@ -24,41 +22,39 @@ export const App = () => {
     percentage: 0
   });
 
+  const [gameState, setGameState] = useState(GameState.NOT_STARTED);
+
   const create = async () => {
-    const txResult = await worldSend("createGame", []);
-
-    const res = await txResult.wait();
-
-    if (res.from.toLowerCase() == connectedAddress.get()?.toLocaleLowerCase()) {
-      return res.logs[0].data;
-    }
+    const createTx = await worldSend("createGame", []);
+    await createTx.wait();
   }
 
-  const start = async () => {
-    setStarted(true);
-
-    if (!!gameID ) {
-      await create();
-    }
-
-    if (!!gameID) {
-      const txResult = await worldSend("startGame", [gameID]);
-
-      console.log(txResult)
-    } else {
-      alert("Game neeeds to be created first...");
-    }
+  const addBot = async (address: string, id: number) => {
+      const startTx = await worldSend("addBot", [id, address]);
+      await startTx.wait();
   }
- 
+
+  const start = async (id: number) => { 
+      const startTx = await worldSend("startGame", [id]);
+      await startTx.wait();
+  }
+
+  useEntityQuery([Has(GlobalTable)]).map(async (id) => {
+    // await addBot("0x0E801D84Fa97b50751Dbf25036d067dCf18858bF", id);
+    // await addBot("0x8f86403A4DE0BB5791fa46B8e795C547942fE4Cf", id);
+  
+    // await start(id);
+  });
+
   return (
     <>
       {
         (
-          !started ? (
+          gameState !== GameState.STARTED ? (
           <div
             className="intro"
-            onClick={(loadingState?.state == SyncState.LIVE) ? start : () => {
-              alert("Loading...")
+            onClick={async () => {
+              setGameState(GameState.STARTED)
             }}
             >
               <img src="textures/title.gif"/>

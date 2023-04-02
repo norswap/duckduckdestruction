@@ -10,7 +10,7 @@ export function Tile(props: ThreeElements["mesh"] & { position: { x: number, y: 
       ref={ref}
       position={[props.position.x, 0, props.position.y]}
       >
-      <boxGeometry args={[1, 1, 1]} />
+      <boxGeometry args={[1,  1, 1]} />
       <meshStandardMaterial map={props.texture} />
     </mesh>
   );
