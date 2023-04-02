@@ -38,9 +38,8 @@ contract GameSystem is SystemPlus {
     function createGame() external returns(uint16 gameID) {
         gameID = GlobalTable.get();
         GlobalTable.set(gameID + 1);
-        GameTable.setId(gameID, gameID);
-        GameTable.setCreator(gameID, _msgSender());
-        GameTable.setRound(gameID, GAME_NOT_STARTED);
+        // function set(uint16 gameID, uint16 id, address creator, uint16 round, uint16 numBots, uint16 alive) internal {
+        GameTable.set(gameID, gameID, _msgSender(), GAME_NOT_STARTED, 0, 0);
     }
 
     // TODO revert to external after tmp functions are removed
