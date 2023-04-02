@@ -37,7 +37,7 @@ library PositionTable {
 
   function getKeySchema() internal pure returns (Schema) {
     SchemaType[] memory _schema = new SchemaType[](3);
-    _schema[0] = SchemaType.BYTES32;
+    _schema[0] = SchemaType.ADDRESS;
     _schema[1] = SchemaType.UINT16;
     _schema[2] = SchemaType.UINT16;
 
@@ -75,9 +75,9 @@ library PositionTable {
   }
 
   /** Get x */
-  function getX(bytes32 player, uint16 game, uint16 round) internal view returns (uint16 x) {
+  function getX(address bot, uint16 game, uint16 round) internal view returns (uint16 x) {
     bytes32[] memory _primaryKeys = new bytes32[](3);
-    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[0] = bytes32(bytes20((bot)));
     _primaryKeys[1] = bytes32(uint256((game)));
     _primaryKeys[2] = bytes32(uint256((round)));
 
@@ -86,9 +86,9 @@ library PositionTable {
   }
 
   /** Get x (using the specified store) */
-  function getX(IStore _store, bytes32 player, uint16 game, uint16 round) internal view returns (uint16 x) {
+  function getX(IStore _store, address bot, uint16 game, uint16 round) internal view returns (uint16 x) {
     bytes32[] memory _primaryKeys = new bytes32[](3);
-    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[0] = bytes32(bytes20((bot)));
     _primaryKeys[1] = bytes32(uint256((game)));
     _primaryKeys[2] = bytes32(uint256((round)));
 
@@ -97,9 +97,9 @@ library PositionTable {
   }
 
   /** Set x */
-  function setX(bytes32 player, uint16 game, uint16 round, uint16 x) internal {
+  function setX(address bot, uint16 game, uint16 round, uint16 x) internal {
     bytes32[] memory _primaryKeys = new bytes32[](3);
-    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[0] = bytes32(bytes20((bot)));
     _primaryKeys[1] = bytes32(uint256((game)));
     _primaryKeys[2] = bytes32(uint256((round)));
 
@@ -107,9 +107,9 @@ library PositionTable {
   }
 
   /** Set x (using the specified store) */
-  function setX(IStore _store, bytes32 player, uint16 game, uint16 round, uint16 x) internal {
+  function setX(IStore _store, address bot, uint16 game, uint16 round, uint16 x) internal {
     bytes32[] memory _primaryKeys = new bytes32[](3);
-    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[0] = bytes32(bytes20((bot)));
     _primaryKeys[1] = bytes32(uint256((game)));
     _primaryKeys[2] = bytes32(uint256((round)));
 
@@ -117,9 +117,9 @@ library PositionTable {
   }
 
   /** Get y */
-  function getY(bytes32 player, uint16 game, uint16 round) internal view returns (uint16 y) {
+  function getY(address bot, uint16 game, uint16 round) internal view returns (uint16 y) {
     bytes32[] memory _primaryKeys = new bytes32[](3);
-    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[0] = bytes32(bytes20((bot)));
     _primaryKeys[1] = bytes32(uint256((game)));
     _primaryKeys[2] = bytes32(uint256((round)));
 
@@ -128,9 +128,9 @@ library PositionTable {
   }
 
   /** Get y (using the specified store) */
-  function getY(IStore _store, bytes32 player, uint16 game, uint16 round) internal view returns (uint16 y) {
+  function getY(IStore _store, address bot, uint16 game, uint16 round) internal view returns (uint16 y) {
     bytes32[] memory _primaryKeys = new bytes32[](3);
-    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[0] = bytes32(bytes20((bot)));
     _primaryKeys[1] = bytes32(uint256((game)));
     _primaryKeys[2] = bytes32(uint256((round)));
 
@@ -139,9 +139,9 @@ library PositionTable {
   }
 
   /** Set y */
-  function setY(bytes32 player, uint16 game, uint16 round, uint16 y) internal {
+  function setY(address bot, uint16 game, uint16 round, uint16 y) internal {
     bytes32[] memory _primaryKeys = new bytes32[](3);
-    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[0] = bytes32(bytes20((bot)));
     _primaryKeys[1] = bytes32(uint256((game)));
     _primaryKeys[2] = bytes32(uint256((round)));
 
@@ -149,9 +149,9 @@ library PositionTable {
   }
 
   /** Set y (using the specified store) */
-  function setY(IStore _store, bytes32 player, uint16 game, uint16 round, uint16 y) internal {
+  function setY(IStore _store, address bot, uint16 game, uint16 round, uint16 y) internal {
     bytes32[] memory _primaryKeys = new bytes32[](3);
-    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[0] = bytes32(bytes20((bot)));
     _primaryKeys[1] = bytes32(uint256((game)));
     _primaryKeys[2] = bytes32(uint256((round)));
 
@@ -159,9 +159,9 @@ library PositionTable {
   }
 
   /** Get the full data */
-  function get(bytes32 player, uint16 game, uint16 round) internal view returns (PositionTableData memory _table) {
+  function get(address bot, uint16 game, uint16 round) internal view returns (PositionTableData memory _table) {
     bytes32[] memory _primaryKeys = new bytes32[](3);
-    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[0] = bytes32(bytes20((bot)));
     _primaryKeys[1] = bytes32(uint256((game)));
     _primaryKeys[2] = bytes32(uint256((round)));
 
@@ -172,12 +172,12 @@ library PositionTable {
   /** Get the full data (using the specified store) */
   function get(
     IStore _store,
-    bytes32 player,
+    address bot,
     uint16 game,
     uint16 round
   ) internal view returns (PositionTableData memory _table) {
     bytes32[] memory _primaryKeys = new bytes32[](3);
-    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[0] = bytes32(bytes20((bot)));
     _primaryKeys[1] = bytes32(uint256((game)));
     _primaryKeys[2] = bytes32(uint256((round)));
 
@@ -186,11 +186,11 @@ library PositionTable {
   }
 
   /** Set the full data using individual values */
-  function set(bytes32 player, uint16 game, uint16 round, uint16 x, uint16 y) internal {
+  function set(address bot, uint16 game, uint16 round, uint16 x, uint16 y) internal {
     bytes memory _data = encode(x, y);
 
     bytes32[] memory _primaryKeys = new bytes32[](3);
-    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[0] = bytes32(bytes20((bot)));
     _primaryKeys[1] = bytes32(uint256((game)));
     _primaryKeys[2] = bytes32(uint256((round)));
 
@@ -198,11 +198,11 @@ library PositionTable {
   }
 
   /** Set the full data using individual values (using the specified store) */
-  function set(IStore _store, bytes32 player, uint16 game, uint16 round, uint16 x, uint16 y) internal {
+  function set(IStore _store, address bot, uint16 game, uint16 round, uint16 x, uint16 y) internal {
     bytes memory _data = encode(x, y);
 
     bytes32[] memory _primaryKeys = new bytes32[](3);
-    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[0] = bytes32(bytes20((bot)));
     _primaryKeys[1] = bytes32(uint256((game)));
     _primaryKeys[2] = bytes32(uint256((round)));
 
@@ -210,13 +210,13 @@ library PositionTable {
   }
 
   /** Set the full data using the data struct */
-  function set(bytes32 player, uint16 game, uint16 round, PositionTableData memory _table) internal {
-    set(player, game, round, _table.x, _table.y);
+  function set(address bot, uint16 game, uint16 round, PositionTableData memory _table) internal {
+    set(bot, game, round, _table.x, _table.y);
   }
 
   /** Set the full data using the data struct (using the specified store) */
-  function set(IStore _store, bytes32 player, uint16 game, uint16 round, PositionTableData memory _table) internal {
-    set(_store, player, game, round, _table.x, _table.y);
+  function set(IStore _store, address bot, uint16 game, uint16 round, PositionTableData memory _table) internal {
+    set(_store, bot, game, round, _table.x, _table.y);
   }
 
   /** Decode the tightly packed blob using this table's schema */
@@ -232,9 +232,9 @@ library PositionTable {
   }
 
   /* Delete all data for given keys */
-  function deleteRecord(bytes32 player, uint16 game, uint16 round) internal {
+  function deleteRecord(address bot, uint16 game, uint16 round) internal {
     bytes32[] memory _primaryKeys = new bytes32[](3);
-    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[0] = bytes32(bytes20((bot)));
     _primaryKeys[1] = bytes32(uint256((game)));
     _primaryKeys[2] = bytes32(uint256((round)));
 
@@ -242,9 +242,9 @@ library PositionTable {
   }
 
   /* Delete all data for given keys (using the specified store) */
-  function deleteRecord(IStore _store, bytes32 player, uint16 game, uint16 round) internal {
+  function deleteRecord(IStore _store, address bot, uint16 game, uint16 round) internal {
     bytes32[] memory _primaryKeys = new bytes32[](3);
-    _primaryKeys[0] = bytes32((player));
+    _primaryKeys[0] = bytes32(bytes20((bot)));
     _primaryKeys[1] = bytes32(uint256((game)));
     _primaryKeys[2] = bytes32(uint256((round)));
 

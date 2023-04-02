@@ -23,8 +23,8 @@ uint256 constant GameTableTableId = _tableId;
 struct GameTableData {
   address creator;
   uint16 round;
+  uint16 numBots;
   uint16 alive;
-  bytes20[] bots;
 }
 
 library GameTable {
@@ -34,7 +34,7 @@ library GameTable {
     _schema[0] = SchemaType.ADDRESS;
     _schema[1] = SchemaType.UINT16;
     _schema[2] = SchemaType.UINT16;
-    _schema[3] = SchemaType.BYTES20_ARRAY;
+    _schema[3] = SchemaType.UINT16;
 
     return SchemaLib.encode(_schema);
   }
@@ -51,8 +51,8 @@ library GameTable {
     string[] memory _fieldNames = new string[](4);
     _fieldNames[0] = "creator";
     _fieldNames[1] = "round";
-    _fieldNames[2] = "alive";
-    _fieldNames[3] = "bots";
+    _fieldNames[2] = "numBots";
+    _fieldNames[3] = "alive";
     return ("GameTable", _fieldNames);
   }
 
@@ -146,12 +146,46 @@ library GameTable {
     _store.setField(_tableId, _primaryKeys, 1, abi.encodePacked((round)));
   }
 
+  /** Get numBots */
+  function getNumBots(uint16 gameID) internal view returns (uint16 numBots) {
+    bytes32[] memory _primaryKeys = new bytes32[](1);
+    _primaryKeys[0] = bytes32(uint256((gameID)));
+
+    bytes memory _blob = StoreSwitch.getField(_tableId, _primaryKeys, 2);
+    return (uint16(Bytes.slice2(_blob, 0)));
+  }
+
+  /** Get numBots (using the specified store) */
+  function getNumBots(IStore _store, uint16 gameID) internal view returns (uint16 numBots) {
+    bytes32[] memory _primaryKeys = new bytes32[](1);
+    _primaryKeys[0] = bytes32(uint256((gameID)));
+
+    bytes memory _blob = _store.getField(_tableId, _primaryKeys, 2);
+    return (uint16(Bytes.slice2(_blob, 0)));
+  }
+
+  /** Set numBots */
+  function setNumBots(uint16 gameID, uint16 numBots) internal {
+    bytes32[] memory _primaryKeys = new bytes32[](1);
+    _primaryKeys[0] = bytes32(uint256((gameID)));
+
+    StoreSwitch.setField(_tableId, _primaryKeys, 2, abi.encodePacked((numBots)));
+  }
+
+  /** Set numBots (using the specified store) */
+  function setNumBots(IStore _store, uint16 gameID, uint16 numBots) internal {
+    bytes32[] memory _primaryKeys = new bytes32[](1);
+    _primaryKeys[0] = bytes32(uint256((gameID)));
+
+    _store.setField(_tableId, _primaryKeys, 2, abi.encodePacked((numBots)));
+  }
+
   /** Get alive */
   function getAlive(uint16 gameID) internal view returns (uint16 alive) {
     bytes32[] memory _primaryKeys = new bytes32[](1);
     _primaryKeys[0] = bytes32(uint256((gameID)));
 
-    bytes memory _blob = StoreSwitch.getField(_tableId, _primaryKeys, 2);
+    bytes memory _blob = StoreSwitch.getField(_tableId, _primaryKeys, 3);
     return (uint16(Bytes.slice2(_blob, 0)));
   }
 
@@ -160,7 +194,7 @@ library GameTable {
     bytes32[] memory _primaryKeys = new bytes32[](1);
     _primaryKeys[0] = bytes32(uint256((gameID)));
 
-    bytes memory _blob = _store.getField(_tableId, _primaryKeys, 2);
+    bytes memory _blob = _store.getField(_tableId, _primaryKeys, 3);
     return (uint16(Bytes.slice2(_blob, 0)));
   }
 
@@ -169,7 +203,7 @@ library GameTable {
     bytes32[] memory _primaryKeys = new bytes32[](1);
     _primaryKeys[0] = bytes32(uint256((gameID)));
 
-    StoreSwitch.setField(_tableId, _primaryKeys, 2, abi.encodePacked((alive)));
+    StoreSwitch.setField(_tableId, _primaryKeys, 3, abi.encodePacked((alive)));
   }
 
   /** Set alive (using the specified store) */
@@ -177,57 +211,7 @@ library GameTable {
     bytes32[] memory _primaryKeys = new bytes32[](1);
     _primaryKeys[0] = bytes32(uint256((gameID)));
 
-    _store.setField(_tableId, _primaryKeys, 2, abi.encodePacked((alive)));
-  }
-
-  /** Get bots */
-  function getBots(uint16 gameID) internal view returns (bytes20[] memory bots) {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32(uint256((gameID)));
-
-    bytes memory _blob = StoreSwitch.getField(_tableId, _primaryKeys, 3);
-    return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_bytes20());
-  }
-
-  /** Get bots (using the specified store) */
-  function getBots(IStore _store, uint16 gameID) internal view returns (bytes20[] memory bots) {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32(uint256((gameID)));
-
-    bytes memory _blob = _store.getField(_tableId, _primaryKeys, 3);
-    return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_bytes20());
-  }
-
-  /** Set bots */
-  function setBots(uint16 gameID, bytes20[] memory bots) internal {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32(uint256((gameID)));
-
-    StoreSwitch.setField(_tableId, _primaryKeys, 3, EncodeArray.encode((bots)));
-  }
-
-  /** Set bots (using the specified store) */
-  function setBots(IStore _store, uint16 gameID, bytes20[] memory bots) internal {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32(uint256((gameID)));
-
-    _store.setField(_tableId, _primaryKeys, 3, EncodeArray.encode((bots)));
-  }
-
-  /** Push an element to bots */
-  function pushBots(uint16 gameID, bytes20 _element) internal {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32(uint256((gameID)));
-
-    StoreSwitch.pushToField(_tableId, _primaryKeys, 3, abi.encodePacked((_element)));
-  }
-
-  /** Push an element to bots (using the specified store) */
-  function pushBots(IStore _store, uint16 gameID, bytes20 _element) internal {
-    bytes32[] memory _primaryKeys = new bytes32[](1);
-    _primaryKeys[0] = bytes32(uint256((gameID)));
-
-    _store.pushToField(_tableId, _primaryKeys, 3, abi.encodePacked((_element)));
+    _store.setField(_tableId, _primaryKeys, 3, abi.encodePacked((alive)));
   }
 
   /** Get the full data */
@@ -249,8 +233,8 @@ library GameTable {
   }
 
   /** Set the full data using individual values */
-  function set(uint16 gameID, address creator, uint16 round, uint16 alive, bytes20[] memory bots) internal {
-    bytes memory _data = encode(creator, round, alive, bots);
+  function set(uint16 gameID, address creator, uint16 round, uint16 numBots, uint16 alive) internal {
+    bytes memory _data = encode(creator, round, numBots, alive);
 
     bytes32[] memory _primaryKeys = new bytes32[](1);
     _primaryKeys[0] = bytes32(uint256((gameID)));
@@ -259,15 +243,8 @@ library GameTable {
   }
 
   /** Set the full data using individual values (using the specified store) */
-  function set(
-    IStore _store,
-    uint16 gameID,
-    address creator,
-    uint16 round,
-    uint16 alive,
-    bytes20[] memory bots
-  ) internal {
-    bytes memory _data = encode(creator, round, alive, bots);
+  function set(IStore _store, uint16 gameID, address creator, uint16 round, uint16 numBots, uint16 alive) internal {
+    bytes memory _data = encode(creator, round, numBots, alive);
 
     bytes32[] memory _primaryKeys = new bytes32[](1);
     _primaryKeys[0] = bytes32(uint256((gameID)));
@@ -277,45 +254,28 @@ library GameTable {
 
   /** Set the full data using the data struct */
   function set(uint16 gameID, GameTableData memory _table) internal {
-    set(gameID, _table.creator, _table.round, _table.alive, _table.bots);
+    set(gameID, _table.creator, _table.round, _table.numBots, _table.alive);
   }
 
   /** Set the full data using the data struct (using the specified store) */
   function set(IStore _store, uint16 gameID, GameTableData memory _table) internal {
-    set(_store, gameID, _table.creator, _table.round, _table.alive, _table.bots);
+    set(_store, gameID, _table.creator, _table.round, _table.numBots, _table.alive);
   }
 
   /** Decode the tightly packed blob using this table's schema */
-  function decode(bytes memory _blob) internal view returns (GameTableData memory _table) {
-    // 24 is the total byte length of static data
-    PackedCounter _encodedLengths = PackedCounter.wrap(Bytes.slice32(_blob, 24));
-
+  function decode(bytes memory _blob) internal pure returns (GameTableData memory _table) {
     _table.creator = (address(Bytes.slice20(_blob, 0)));
 
     _table.round = (uint16(Bytes.slice2(_blob, 20)));
 
-    _table.alive = (uint16(Bytes.slice2(_blob, 22)));
+    _table.numBots = (uint16(Bytes.slice2(_blob, 22)));
 
-    uint256 _start;
-    uint256 _end = 56;
-
-    _start = _end;
-    _end += _encodedLengths.atIndex(0);
-    _table.bots = (SliceLib.getSubslice(_blob, _start, _end).decodeArray_bytes20());
+    _table.alive = (uint16(Bytes.slice2(_blob, 24)));
   }
 
   /** Tightly pack full data using this table's schema */
-  function encode(
-    address creator,
-    uint16 round,
-    uint16 alive,
-    bytes20[] memory bots
-  ) internal view returns (bytes memory) {
-    uint16[] memory _counters = new uint16[](1);
-    _counters[0] = uint16(bots.length * 20);
-    PackedCounter _encodedLengths = PackedCounterLib.pack(_counters);
-
-    return abi.encodePacked(creator, round, alive, _encodedLengths.unwrap(), EncodeArray.encode((bots)));
+  function encode(address creator, uint16 round, uint16 numBots, uint16 alive) internal view returns (bytes memory) {
+    return abi.encodePacked(creator, round, numBots, alive);
   }
 
   /* Delete all data for given keys */
