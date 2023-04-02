@@ -49,11 +49,12 @@ function Scene() {
 
    const [roundIdx, setRoundIdx] = useState(0);
    const [gameIdx, setGameIdx] = useState(0);
+   const maxRounds = 16;
 
     useEffect(() => {
       //Implementing the setInterval method
       const interval = setInterval(() => {
-          if (roundIdx < 9) {
+          if (roundIdx < maxRounds - 1) {
             setRoundIdx(roundIdx + 1);
           } else {
             setRoundIdx(0);
@@ -65,8 +66,7 @@ function Scene() {
             }
           }
 
-          console.log(roundIdx)
-          console.log(gameIdx)
+          console.log("round", roundIdx)
       }, 1500);
 
       //Clearing the interval
@@ -95,6 +95,11 @@ function Scene() {
           attributes
         }
       });
+
+    useEffect(() => {
+      const aliveBots = bots.filter(bot => bot && bot.attributes && bot.attributes.health > 0);
+      if (aliveBots.length <= 1) setRoundIdx(0)
+    }, [roundIdx])
 
   //useEffect(() => {
   //  const interval = setInterval(() => {
@@ -155,7 +160,7 @@ function Scene() {
           return (
           <Player
             key={i}
-            position={[p?.position.x, 0, p?.position.y]}
+            position={[p?.position?.x, 0, p?.position?.y]}
             attributes={p.attributes}
             color={(parseInt(p.entity) * 123456) % 16777215}
           />)
