@@ -15,6 +15,8 @@ contract ScenarioTest is MudV2Test {
 
     function setUp() public override {
         super.setUp();
+        address deployer = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+        vm.startPrank(deployer);
         world = IWorld(worldAddress);
         address hook = address(new ReversePositionTableHook());
         console.log("hook address", hook);
@@ -33,6 +35,7 @@ contract ScenarioTest is MudV2Test {
             world.grantAccess("", "SubmitSystem", bots[i]);
             console.log("ExampleBot address", bots[i]);
         }
+        vm.stopPrank();
     }
 
     function testRounds() public {

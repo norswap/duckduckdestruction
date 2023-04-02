@@ -6,8 +6,6 @@ import { GameTable } from "src/tables/GameTable.sol";
 import { ActionTable, ActionTableData } from "src/tables/ActionTable.sol";
 import { ActionType, Direction } from "src/Types.sol";
 
-import { console } from "forge-std/console.sol";
-
 contract SubmitSystem is SystemPlus {
 
     error ActionAlreadySubmitted();
@@ -24,13 +22,8 @@ contract SubmitSystem is SystemPlus {
      * (MoveSystem, AttackSystem, ...) and can still result in an ineffective action.
      */
     function submitAction(uint16 gameID, uint16 index, ActionTableData memory action) external {
-        console.log("msgsender");
         address bot = _msgSender();
-        console.log("submitting", bot, gameID, index);
-
         uint16 round = GameTable.getRound(gameID);
-        console.log("yup they can read");
-
         ActionTableData memory old = ActionTable.get(bot, gameID, round);
 
         if (old.actionType != ActionType.NONE)

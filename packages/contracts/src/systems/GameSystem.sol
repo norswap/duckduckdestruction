@@ -14,8 +14,7 @@ import { Bot } from "src/bots/Bot.sol";
 import { ActionType, Direction } from "src/Types.sol";
 import "src/Globals.sol";
 
-// TODO remove
-import { console } from "forge-std/console.sol";
+import { console2 } from "forge-std/console2.sol";
 
 error CreatorOnly();
 error LateJoin();
@@ -111,7 +110,7 @@ contract GameSystem is SystemPlus {
         // This must happen before applying the effect of actions: all bots take decision based
         // on the previous round's end state.
         for (uint256 i = 0; i < length; i++) {
-            console.log("react", i);
+            console2.log("reacting", round, i);
             console.log(bots[i]);
             Bot(bots[i]).react(gameID, round, uint16(i));
         }
@@ -120,7 +119,7 @@ contract GameSystem is SystemPlus {
         uint256 alive = 0;
 
         for (uint256 i = 0; i < length; i++) {
-            console.log("enacting", i);
+            console2.log("enacting", round, i);
             address bot = bots[i];
             uint16 health = AttributeTable.getHealth(bot, gameID, round);
             if (health == 0) continue; // RIP
@@ -144,7 +143,7 @@ contract GameSystem is SystemPlus {
         }
 
         unchecked {
-            GameTable.setRound(gameID, round++);
+            GameTable.setRound(gameID, round + 1);
             GameTable.setAlive(gameID, uint16(alive));
         }
     }
