@@ -12,7 +12,7 @@ uint8 constant DISCHARGE_SPEED = 1;
 uint8 constant MAP_HEIGHT = 50;
 uint8 constant MAP_WIDTH = 50;
 
-uint16 constant MOVE_DISTANCE = 1;
+//uint16 constant MOVE_DISTANCE = 1;
 uint16 constant DASH_DISTANCE = 3;
 uint8 constant DASH_COOLDOWN = 7;
 
@@ -27,4 +27,5 @@ uint16 constant MAX_ROUND = 5000;
 
 // Overrides for a fast game
 uint16 constant INITIAL_HEALTH = 1;
-uint16 constant SHOOT_RADIUS = 10;
+uint16 constant SHOOT_RADIUS = 6;
+uint16 constant MOVE_DISTANCE = 3;

@@ -14,7 +14,11 @@ import { console2 } from "forge-std/console2.sol";
 
 contract ExampleBot is Bot {
 
+    bytes32 random = 0x0;
+
     function react(uint16 gameID, uint16 round, uint16 index) external override {
+
+        if (random == 0x0) random = keccak256(abi.encodePacked(blockhash(block.number - 1), this));
 
         PositionTableData memory myPosition = PositionTable.get(world(), address(this), gameID, round);
 
@@ -37,12 +41,12 @@ contract ExampleBot is Bot {
         }
 
         // Otherwise take a random move.
-        uint256 random = uint256(keccak256(abi.encodePacked(blockhash(block.number - 1), this)));
         ActionTableData memory action = ActionTableData({
             actionType: ActionType.MOVE,
-            direction: Direction((random % uint256(type(Direction).max) + 1)),
+            direction: Direction((uint256(random) % uint256(type(Direction).max) + 1)),
             target: address(0)
         });
+        random = keccak256(abi.encodePacked(random));
         submitAction(gameID, index, action);
     }
 }
